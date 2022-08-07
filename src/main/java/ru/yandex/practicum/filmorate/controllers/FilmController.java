@@ -3,9 +3,9 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.controllers.errors.NotFoundException;
-import ru.yandex.practicum.filmorate.controllers.errors.WrongDataException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.controllers.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.controllers.exceptions.BadRequestException;
+import ru.yandex.practicum.filmorate.models.Film;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -19,8 +19,6 @@ import java.util.Map;
 public class FilmController {
     private final Map<Integer, Film> films = new HashMap<>();
     private int nextId = 1;
-    final int MAX_DESCRIPTION_LENGTH = 200;
-    final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -29,11 +27,11 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        validateFilm(film);
+        validateReleaseDate(film);
         int id = getNextId();
         film.setId(id);
         films.put(id, film);
-        log.trace("Создан новый фильм {}", film);
+        log.debug("Создан новый фильм {}", film);
         return films.get(id);
     }
 
@@ -43,9 +41,9 @@ public class FilmController {
         if (! films.containsKey(id)) {
             throw new NotFoundException(String.format("Нет фильма с таким id: %d", id));
         }
-        validateFilm(film);
+        validateReleaseDate(film);
         films.put(id, film);
-        log.trace("Данные фильма {} изменены {}", id, film);
+        log.debug("Данные фильма {} изменены {}", id, film);
         return films.get(id);
     }
 
@@ -56,26 +54,18 @@ public class FilmController {
         return e.getMessage();
     }
 
-    @ExceptionHandler(WrongDataException.class)
+    @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String wrongData(WrongDataException e) {
+    public String wrongData(BadRequestException e) {
         log.warn(e.getMessage());
         return e.getMessage();
     }
 
-    private void validateFilm(Film film) {
-        if (film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-            throw new WrongDataException(String.format(
-                    "Слишком длинное описание '%s', должно быть не длиннее %d",
-                    film.getDescription(),
-                    MAX_DESCRIPTION_LENGTH));
-        }
-
-        if (film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
-            throw new WrongDataException(String.format(
-                    "Неправдоподобная дата релиза %s, до изобретения кинематографа %s",
-                    film.getReleaseDate(),
-                    CINEMA_BIRTHDAY));
+    private void validateReleaseDate(Film film) {
+        if (!film.isReleaseDateCorrect()) {
+            throw new BadRequestException(String.format(
+                    "Неправдоподобная дата релиза %s, до изобретения кинематографа",
+                    film.getReleaseDate()));
         }
     }
 

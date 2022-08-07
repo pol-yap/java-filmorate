@@ -1,0 +1,7 @@
+logging.level.ru.yandex.practicum.filmorate.controllers: trace
+
+#for some another port
+#server.port: 8081
+
+#for random port
+#server.port: 0
