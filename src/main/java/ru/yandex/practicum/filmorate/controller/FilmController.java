@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -22,12 +22,12 @@ public class FilmController {
     }
 
     @GetMapping
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         return service.findAll();
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getTop(@RequestParam(defaultValue = "10") int count) {
+    public List<Film> getTop(@RequestParam(defaultValue = "10") int count) {
         return service.getTop(count);
     }
 

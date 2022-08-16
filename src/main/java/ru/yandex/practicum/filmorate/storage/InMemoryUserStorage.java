@@ -18,12 +18,14 @@ public class InMemoryUserStorage implements UserStorage {
     public User create(final User user) {
         user.setId(getNextId());
         users.put(user.getId(), user);
+
         return user;
     }
 
     @Override
     public User update(final int id, final User user) {
         users.put(id, user);
+
         return users.get(id);
     }
 
@@ -52,11 +54,13 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User addFriend(final int userId, final int friendId) {
         users.get(userId).getFriendsId().add(friendId);
+
         return users.get(userId);
     }
 
     public User removeFriend(final int userId, final int friendId) {
         users.get(userId).getFriendsId().remove(friendId);
+
         return users.get(userId) ;
     }
 
@@ -67,6 +71,7 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> getCommonFriends(final int id, final int otherId) {
         List<Integer> commonFriendsId = new ArrayList<>(users.get(id).getFriendsId());
         commonFriendsId.retainAll(users.get(otherId).getFriendsId());
+
         return findByIds(commonFriendsId);
     }
 

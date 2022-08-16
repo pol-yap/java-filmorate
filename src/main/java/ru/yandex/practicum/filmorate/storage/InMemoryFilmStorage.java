@@ -17,12 +17,14 @@ public class InMemoryFilmStorage implements FilmStorage{
     public Film create(final Film film) {
         film.setId(getNextId());
         films.put(film.getId(), film);
+
         return film;
     }
 
     @Override
     public Film update(final int id, final Film film) {
-       films.put(id, film);
+        films.put(id, film);
+
         return films.get(id);
     }
 
@@ -44,12 +46,14 @@ public class InMemoryFilmStorage implements FilmStorage{
     @Override
     public Film addLike(int filmId, int userId) {
         films.get(filmId).getLikes().add(userId);
+
         return films.get(filmId);
     }
 
     @Override
     public Film removeLike(int filmId, int userId) {
         films.get(filmId).getLikes().remove(userId);
+
         return films.get(filmId);
     }
 

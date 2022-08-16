@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -32,6 +32,7 @@ public class FilmService {
 
     public Film update(int id, Film film) {
         throwExceptionIfNoSuchId(id);
+
         return storage.update(id, film);
     }
 
@@ -41,18 +42,21 @@ public class FilmService {
 
     public Film findById(int id) {
         throwExceptionIfNoSuchId(id);
+
         return storage.findById(id);
     }
 
     public Film addLike(int filmId, int userId) {
         throwExceptionIfNoSuchId(filmId);
         userService.throwExceptionIfNoSuchId(userId);
+
         return storage.addLike(filmId, userId);
     }
 
     public Film removeLike(int filmId, int userId) {
         throwExceptionIfNoSuchId(filmId);
         userService.throwExceptionIfNoSuchId(userId);
+
         return storage.removeLike(filmId, userId);
     }
 
@@ -62,7 +66,7 @@ public class FilmService {
 
     private void throwExceptionIfNoSuchId(int id) {
         if (! storage.isContainsId(id)) {
-            throw new FilmNotFoundException(id);
+            throw new NotFoundException(id, "фильм");
         }
     }
 }

@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.List;
@@ -18,17 +18,20 @@ public class UserService {
 
     public User create(User user) {
         fixName(user);
+
         return storage.create(user);
     }
 
     public User update(int id, User user) {
         throwExceptionIfNoSuchId(id);
         fixName(user);
+
         return storage.update(id, user);
     }
 
     public User findById(int id) {
         throwExceptionIfNoSuchId(id);
+
         return storage.findById(id);
     }
 
@@ -41,6 +44,7 @@ public class UserService {
         throwExceptionIfNoSuchId(friendId);
         //взаминость!!!
         storage.addFriend(friendId, userId);
+
         return storage.addFriend(userId, friendId);
     }
 
@@ -49,23 +53,26 @@ public class UserService {
         throwExceptionIfNoSuchId(friendId);
         //взаминость!!!
         storage.removeFriend(friendId, userId);
+
         return storage.removeFriend(userId, friendId);
     }
 
     public List<User> getFriends(int id) {
         throwExceptionIfNoSuchId(id);
+
         return storage.getFriends(id);
     }
 
     public List<User> getCommonFriends(int userId1, int userId2) {
         throwExceptionIfNoSuchId(userId1);
         throwExceptionIfNoSuchId(userId2);
+
         return storage.getCommonFriends(userId1, userId2);
     }
 
     protected void throwExceptionIfNoSuchId(int id) {
         if (! storage.isContainsId(id)) {
-            throw new UserNotFoundException(id);
+            throw new NotFoundException(id, "пользователь");
         }
     }
 

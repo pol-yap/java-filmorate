@@ -6,9 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
 @RestControllerAdvice
@@ -16,14 +15,8 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFound(UserNotFoundException e) {
-        return new ErrorResponse(String.format("Не найден пользователь с id=%d", e.getId()));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleFilmNotFound(FilmNotFoundException e) {
-        return new ErrorResponse(String.format("Не найден фильм с id=%d", e.getId()));
+    public ErrorResponse handleNotFound(NotFoundException e) {
+        return new ErrorResponse(String.format("Не найден %s с id=%d", e.getEntity(), e.getId()));
     }
 
     @ExceptionHandler
@@ -36,7 +29,9 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationExceptions(MethodArgumentNotValidException e) {
         ErrorResponse response = new ErrorResponse();
-        e.getBindingResult().getAllErrors().forEach(error -> response.addError(((FieldError) error).getField() + " " + error.getDefaultMessage()));
+        e.getBindingResult()
+                .getAllErrors()
+                .forEach(error -> response.addError(((FieldError) error).getField() + " " + error.getDefaultMessage()));
         return response;
     }
 }
