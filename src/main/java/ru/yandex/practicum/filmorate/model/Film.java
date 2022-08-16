@@ -1,10 +1,12 @@
-package ru.yandex.practicum.filmorate.models;
+package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Data
@@ -14,6 +16,7 @@ public class Film {
     final static LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
 
     private int id;
+    private final Set<Integer> likes = new HashSet<>();
     @NotBlank
     private String name;
     @Size(max=MAX_DESCRIPTION_LENGTH)

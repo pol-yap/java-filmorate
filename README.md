@@ -1,2 +1,2 @@
 # Filmorate
-Template repository for Filmorate project.
+Сервис оценки и рекомендации фильмов
