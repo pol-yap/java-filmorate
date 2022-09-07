@@ -28,8 +28,6 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public User findById(@PathVariable int userId) {
-        log.debug("we are in findById");
-
         return service.findById(userId);
     }
 

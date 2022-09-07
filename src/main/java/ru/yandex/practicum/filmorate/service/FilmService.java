@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -11,14 +12,12 @@ import java.util.List;
 
 @Service
 public class FilmService {
-    private final FilmStorage storage;
-    private final UserService userService;
+    @Autowired
+    @Qualifier("filmDBStorage")
+    private FilmStorage storage;
 
     @Autowired
-    public FilmService(FilmStorage storage, UserService userService) {
-        this.storage = storage;
-        this.userService = userService;
-    }
+    private UserService userService;
 
     public Film create(Film film) {
         if (! film.isReleaseDateCorrect()) {

@@ -32,9 +32,7 @@ public class FilmController {
     }
 
     @GetMapping("/{filmId}")
-    public Film findById(@PathVariable int filmId) {
-        return service.findById(filmId);
-    }
+    public Film findById(@PathVariable int filmId) { return service.findById(filmId);  }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

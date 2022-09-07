@@ -1,7 +1,8 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.memory;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,13 +36,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> findByIds(List<Integer> ids) {
-        return ids.stream()
-                .map(this::findById)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<User> findAll() {
         return List.copyOf(users.values());
     }
@@ -65,7 +59,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public List<User> getFriends(final int id) {
-        return findByIds(List.copyOf(users.get(id).getFriendsId()));
+        return users.get(id).getFriendsId()
+                    .stream()
+                    .map(this::findById)
+                    .collect(Collectors.toList());
+    }
+
+    public List<Integer> getFriendsId(final int id) {
+        return new ArrayList<>(users.get(id).getFriendsId());
     }
 
     public List<User> getCommonFriends(final int id, final int otherId) {
@@ -77,6 +78,12 @@ public class InMemoryUserStorage implements UserStorage {
 
     private int getNextId() {
         return nextId++;
+    }
+
+    private List<User> findByIds(List<Integer> ids) {
+        return ids.stream()
+                  .map(this::findById)
+                  .collect(Collectors.toList());
     }
 
 }

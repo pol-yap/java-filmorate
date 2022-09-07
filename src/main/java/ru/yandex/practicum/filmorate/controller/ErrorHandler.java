@@ -30,8 +30,8 @@ public class ErrorHandler {
     public ErrorResponse handleValidationExceptions(MethodArgumentNotValidException e) {
         ErrorResponse response = new ErrorResponse();
         e.getBindingResult()
-                .getAllErrors()
-                .forEach(error -> response.addError(((FieldError) error).getField() + " " + error.getDefaultMessage()));
+         .getAllErrors()
+          .forEach(error -> response.addError(((FieldError) error).getField() + " " + error.getDefaultMessage()));
         return response;
     }
 }
