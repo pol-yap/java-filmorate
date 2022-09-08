@@ -11,36 +11,38 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class GenreDBStorage implements GenreStorage {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    public Genre create(final Genre genre) {
+    public Optional<Genre> create(final Genre genre) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("Genres")
                 .usingGeneratedKeyColumns("id");
         int id = simpleJdbcInsert.executeAndReturnKey(genreToMap(genre)).intValue();
-        genre.setId(id);
 
-        return genre;
+        return findById(id);
     }
 
-    public Genre update(final int id, final Genre genre) {
+    public Optional<Genre> update(final int id, final Genre genre) {
         String sql = "UPDATE Genres SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, genre.getName(), id);
 
-        return genre;
+        return findById(id);
     }
 
-    public Genre findById(final int id) {
+    public Optional<Genre> findById(final int id) {
         String sql = "SELECT * FROM Genres Films WHERE id = ?";
 
-        return jdbcTemplate.queryForObject(sql, this::rowToGenre, id);
+        return jdbcTemplate.query(sql, this::rowToGenre, id)
+                           .stream()
+                           .findFirst();
     }
 
-    public boolean isContainsId(int id) {
+    public boolean isContainsId(final int id) {
         String sql = "SELECT Count(id) FROM Genres WHERE id =?";
         Integer found = jdbcTemplate.queryForObject(sql, Integer.class, id);
 
@@ -53,18 +55,26 @@ public class GenreDBStorage implements GenreStorage {
         return jdbcTemplate.query(sql, this::rowToGenre);
     }
 
-    public List<Genre> findByFilm(int filmId) {
+    public List<Genre> findByFilm(final int filmId) {
         String sql = "SELECT * FROM Genres " +
                 "JOIN Film_genres fg ON Genres.id = fg.genre_id WHERE fg.film_id = ? ORDER BY id";
 
         return jdbcTemplate.query(sql, this::rowToGenre, filmId);
     }
 
-    private Map<String, Object> genreToMap(Genre genre) {
+
+    public List<Integer> findIdsByFilm(final int filmId) {
+        String sql = "SELECT id FROM Genres " +
+                "JOIN Film_genres fg ON Genres.id = fg.genre_id WHERE fg.film_id = ? ORDER BY id";
+
+        return jdbcTemplate.queryForList(sql, Integer.class, filmId);
+    }
+
+    private Map<String, Object> genreToMap(final Genre genre) {
         return Map.of("name", genre.getName());
     }
 
-    private Genre rowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
+    private Genre rowToGenre(final ResultSet resultSet, final int rowNum) throws SQLException {
         return new Genre(
                 resultSet.getInt("id"),
                 resultSet.getString("name")

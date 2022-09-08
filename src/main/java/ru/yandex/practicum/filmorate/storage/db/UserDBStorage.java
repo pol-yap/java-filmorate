@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -12,24 +13,25 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Repository
 public class UserDBStorage implements UserStorage {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public User create(final User user) {
+    public Optional<User> create(final User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("Users")
                 .usingGeneratedKeyColumns("id");
         int id = simpleJdbcInsert.executeAndReturnKey(userToMap(user)).intValue();
-        user.setId(id);
 
-        return user;
+        return findById(id);
     }
 
-    public User update(final int id, final User user) {
+    public Optional<User> update(final int id, final User user) {
         String sql = "UPDATE Users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
         jdbcTemplate.update(
                 sql,
@@ -39,19 +41,19 @@ public class UserDBStorage implements UserStorage {
                 user.getBirthday(),
                 id);
 
-        return user;
+        return findById(id);
     }
 
-    public User findById(final int id) {
+    public Optional<User> findById(final int id) {
         String sql = "SELECT * FROM Users WHERE id = ?";
-        User user = jdbcTemplate.queryForObject(sql, this::rowToUser, id);
-        loadFriendsId(user);
-
-        return user;
+        return jdbcTemplate.query(sql, this::rowToUser, id)
+                           .stream()
+                           .peek(this::loadFriendsId)
+                           .findFirst();
     }
 
     public boolean isContainsId(final int id) {
-        String sql = "SELECT Count(id) FROM Users WHERE id =?";
+        String sql = "SELECT Count(id) FROM Users WHERE id = ?";
         Integer found = jdbcTemplate.queryForObject(sql, Integer.class, id);
 
         return found == 1;
@@ -66,18 +68,14 @@ public class UserDBStorage implements UserStorage {
                            .collect(Collectors.toList());
     }
 
-    public User addFriend(final int friendId, final int userId) {
+    public void addFriend(final int friendId, final int userId) {
         String sql = "INSERT INTO Friendship (friending_id, friended_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, userId, friendId);
-
-        return findById(userId);
     }
 
-    public User removeFriend(final int friendId, final int userId) {
+    public void removeFriend(final int friendId, final int userId) {
         String sql = "DELETE FROM Friendship WHERE friending_id = ? AND friended_id = ?";
         jdbcTemplate.update(sql, userId, friendId);
-
-        return findById(userId);
     }
 
     public List<Integer> getFriendsId(final int id) {
@@ -108,7 +106,7 @@ public class UserDBStorage implements UserStorage {
                            .collect(Collectors.toList());
     }
 
-    private Map<String, Object> userToMap(User user) {
+    private Map<String, Object> userToMap(final User user) {
         return Map.of(
                 "email", user.getEmail(),
                 "login", user.getLogin(),
@@ -116,7 +114,7 @@ public class UserDBStorage implements UserStorage {
                 "birthday", user.getBirthday());
     }
 
-    private User rowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+    private User rowToUser(final ResultSet resultSet, final int rowNum) throws SQLException {
         return User.builder()
                    .id(resultSet.getInt("id"))
                    .email(resultSet.getString("email"))
@@ -126,7 +124,7 @@ public class UserDBStorage implements UserStorage {
                    .build();
     }
 
-    private void loadFriendsId(User user) {
+    private void loadFriendsId(final User user) {
         user.setFriendsId(new HashSet<>(getFriendsId(user.getId())));
     }
 }

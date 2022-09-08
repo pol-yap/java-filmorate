@@ -9,9 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import ru.yandex.practicum.filmorate.model.Film;
@@ -29,7 +27,7 @@ public class FilmDBStorage implements FilmStorage {
     @Autowired
     private GenreStorage genreStorage;
 
-    public Film create(final Film film) {
+    public Optional<Film> create(final Film film) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("Films")
                 .usingGeneratedKeyColumns("id");
@@ -40,7 +38,7 @@ public class FilmDBStorage implements FilmStorage {
         return findById(id);
     }
 
-    public Film update(final int id, final Film film) {
+    public Optional<Film> update(final int id, final Film film) {
         String sql = "UPDATE Films " +
                 "SET name = ?, description = ?, release_date = ?, duration = ?, rating_id = ? " +
                 "WHERE id = ?";
@@ -56,17 +54,17 @@ public class FilmDBStorage implements FilmStorage {
         return findById(id);
     }
 
-    public Film findById(final int id) {
+    public Optional<Film> findById(final int id) {
         String sql = "SELECT *, MPA.name AS rating_name " +
                 "FROM Films LEFT JOIN MPAA_Ratings MPA ON Films.rating_id = MPA.id WHERE Films.id = ?";
-        Film film = jdbcTemplate.queryForObject(sql, this::rowToFilm, id);
-        loadGenres(film);
-        loadLikes(film);
-
-        return film;
+        return jdbcTemplate.query(sql, this::rowToFilm, id)
+                           .stream()
+                           .peek(this::loadGenres)
+                           .peek(this::loadLikes)
+                           .findFirst();
     }
 
-    public boolean isContainsId(int id) {
+    public boolean isContainsId(final int id) {
         String sql = "SELECT Count(id) FROM Films WHERE id =?";
         Integer found = jdbcTemplate.queryForObject(sql, Integer.class, id);
 
@@ -84,21 +82,17 @@ public class FilmDBStorage implements FilmStorage {
                            .collect(Collectors.toList());
     }
 
-    public Film addLike(int filmId, int userId) {
+    public void addLike(final int filmId, final int userId) {
         String sql = "INSERT INTO Likes (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, filmId, userId);
-
-        return findById(filmId);
     }
 
-    public Film removeLike(int filmId, int userId) {
+    public void removeLike(final int filmId, final int userId) {
         String sql = "DELETE FROM Likes WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sql, filmId, userId);
-
-        return findById(filmId);
     }
 
-    public List<Film> getTop(int count) {
+    public List<Film> getTop(final int count) {
         String sql = "SELECT Films.*, MPA.name AS rating_name, Count(Likes.user_id) AS likes_count " +
                 "FROM Films JOIN MPAA_Ratings MPA ON Films.rating_id = MPA.id " +
                 "LEFT JOIN Likes ON Films.id = Likes.film_id " +
@@ -113,7 +107,7 @@ public class FilmDBStorage implements FilmStorage {
                            .collect(Collectors.toList());
     }
 
-    private Map<String, Object> filmToMap(Film film) {
+    private Map<String, Object> filmToMap(final Film film) {
         return Map.of(
                 "name", film.getName(),
                 "description", film.getDescription(),
@@ -123,7 +117,7 @@ public class FilmDBStorage implements FilmStorage {
         );
     }
 
-    private Film rowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+    private Film rowToFilm(final ResultSet resultSet, final int rowNum) throws SQLException {
         return Film.builder()
                    .id(resultSet.getInt("id"))
                    .name(resultSet.getString("name"))
@@ -135,16 +129,16 @@ public class FilmDBStorage implements FilmStorage {
                    .build();
     }
 
-    private void loadGenres(Film film) {
-        film.setGenres(genreStorage.findByFilm(film.getId()));
+    private void loadGenres(final Film film) {
+        film.setGenres(new HashSet<>(genreStorage.findByFilm(film.getId())));
     }
 
-    private void loadLikes(Film film) {
+    private void loadLikes(final Film film) {
         String sql = "SELECT user_id FROM Likes WHERE film_id = ?";
         film.setLikes(new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, film.getId())));
     }
 
-    private void saveGenres(Film film) {
+    private void saveGenres(final Film film) {
         String sql = "DELETE FROM Film_genres WHERE film_id = ?";
         jdbcTemplate.update(sql, film.getId());
 
@@ -152,14 +146,15 @@ public class FilmDBStorage implements FilmStorage {
             return;
         }
 
-        for (Genre genre: film.getGenres()) {
-            sql = "INSERT INTO Film_genres (film_id, genre_id) VALUES (?, ?)";
-            try {
-                jdbcTemplate.update(sql, film.getId(), genre.getId());
-            } catch (DataAccessException e) {
-                log.debug("updateGenresOfFilm: " + e.getMessage());
-            }
-        }
+        film.getGenres().forEach((genre)->this.saveGenre(film, genre));
+    }
 
+    private void saveGenre(final Film film, final Genre genre) {
+        String sql = "INSERT INTO Film_genres (film_id, genre_id) VALUES (?, ?)";
+        try {
+            jdbcTemplate.update(sql, film.getId(), genre.getId());
+        } catch (DataAccessException e) {
+            log.debug("updateGenresOfFilm: " + e.getMessage());
+        }
     }
 }

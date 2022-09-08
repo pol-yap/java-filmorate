@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -15,23 +16,24 @@ public class InMemoryFilmStorage implements FilmStorage {
     private int nextId = 1;
 
     @Override
-    public Film create(final Film film) {
-        film.setId(getNextId());
-        films.put(film.getId(), film);
-
-        return film;
-    }
-
-    @Override
-    public Film update(final int id, final Film film) {
+    public Optional<Film> create(final Film film) {
+        int id = getNextId();
+        film.setId(id);
         films.put(id, film);
 
-        return films.get(id);
+        return findById(id);
     }
 
     @Override
-    public Film findById(final int id) {
-        return films.get(id);
+    public Optional<Film> update(final int id, final Film film) {
+        films.put(id, film);
+
+        return findById(id);
+    }
+
+    @Override
+    public Optional<Film> findById(final int id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override
@@ -45,17 +47,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film addLike(int filmId, int userId) {
+    public void addLike(int filmId, int userId) {
         films.get(filmId).getLikes().add(userId);
-
-        return films.get(filmId);
     }
 
     @Override
-    public Film removeLike(int filmId, int userId) {
+    public void removeLike(int filmId, int userId) {
         films.get(filmId).getLikes().remove(userId);
-
-        return films.get(filmId);
     }
 
     @Override
