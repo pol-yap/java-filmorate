@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -11,14 +12,12 @@ import java.util.List;
 
 @Service
 public class FilmService {
-    private final FilmStorage storage;
-    private final UserService userService;
+    @Autowired
+    @Qualifier("filmDBStorage")
+    private FilmStorage storage;
 
     @Autowired
-    public FilmService(FilmStorage storage, UserService userService) {
-        this.storage = storage;
-        this.userService = userService;
-    }
+    private UserService userService;
 
     public Film create(Film film) {
         if (! film.isReleaseDateCorrect()) {
@@ -27,13 +26,15 @@ public class FilmService {
                     film.getReleaseDate()));
         }
 
-        return storage.create(film);
+        return storage.create(film)
+                      .orElseThrow(()->new BadRequestException("Не удалось создать новый фильм"));
     }
 
     public Film update(int id, Film film) {
         throwExceptionIfNoSuchId(id);
 
-        return storage.update(id, film);
+        return storage.update(id, film)
+                      .orElseThrow(()->new BadRequestException("Не удалось обновить данные о фильме"));
     }
 
     public List<Film> findAll() {
@@ -43,21 +44,20 @@ public class FilmService {
     public Film findById(int id) {
         throwExceptionIfNoSuchId(id);
 
-        return storage.findById(id);
+        return storage.findById(id)
+                      .orElseThrow(()->new NotFoundException(id, "фильм"));
     }
 
-    public Film addLike(int filmId, int userId) {
+    public void addLike(int filmId, int userId) {
         throwExceptionIfNoSuchId(filmId);
         userService.throwExceptionIfNoSuchId(userId);
-
-        return storage.addLike(filmId, userId);
+        storage.addLike(filmId, userId);
     }
 
-    public Film removeLike(int filmId, int userId) {
+    public void removeLike(int filmId, int userId) {
         throwExceptionIfNoSuchId(filmId);
         userService.throwExceptionIfNoSuchId(userId);
-
-        return storage.removeLike(filmId, userId);
+        storage.removeLike(filmId, userId);
     }
 
     public List<Film> getTop(int count) {
