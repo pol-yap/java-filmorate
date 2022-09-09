@@ -28,7 +28,7 @@ public class FilmService {
 
         return storage.create(film)
                       .orElseThrow(()->new BadRequestException("Не удалось создать новый фильм"));
-    }
+=    }
 
     public Film update(int id, Film film) {
         throwExceptionIfNoSuchId(id);

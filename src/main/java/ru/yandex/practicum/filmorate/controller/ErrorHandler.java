@@ -32,6 +32,7 @@ public class ErrorHandler {
         e.getBindingResult()
          .getAllErrors()
           .forEach(error -> response.addError(((FieldError) error).getField() + " " + error.getDefaultMessage()));
+
         return response;
     }
 }
