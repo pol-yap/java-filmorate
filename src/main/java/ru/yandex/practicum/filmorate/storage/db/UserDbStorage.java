@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-public class UserDBStorage implements UserStorage {
+public class UserDbStorage implements UserStorage {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 

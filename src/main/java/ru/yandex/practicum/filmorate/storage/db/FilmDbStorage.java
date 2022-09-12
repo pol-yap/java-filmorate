@@ -20,7 +20,7 @@ import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 @Slf4j
 @Repository
-public class FilmDBStorage implements FilmStorage {
+public class FilmDbStorage implements FilmStorage {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class GenreDBStorage implements GenreStorage {
+public class GenreDbStorage implements GenreStorage {
     @Autowired
     JdbcTemplate jdbcTemplate;
 

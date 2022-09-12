@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class MpaaDBStorage implements MPAStorage {
+public class MpaaDbStorage implements MPAStorage {
     @Autowired
     JdbcTemplate jdbcTemplate;
 

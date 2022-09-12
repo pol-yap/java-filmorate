@@ -11,8 +11,8 @@ import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.MPAStorage;
-import ru.yandex.practicum.filmorate.storage.db.FilmDBStorage;
-import ru.yandex.practicum.filmorate.storage.db.UserDBStorage;
+import ru.yandex.practicum.filmorate.storage.db.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,8 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 
 class FilmoRateApplicationTests {
-    private final UserDBStorage userStorage;
-    private final FilmDBStorage filmStorage;
+    private final UserDbStorage userStorage;
+    private final FilmDbStorage filmStorage;
     private final GenreStorage genreStorage;
     private final MPAStorage mpaStorage;
 
