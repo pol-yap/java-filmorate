@@ -16,12 +16,17 @@ import java.util.Set;
 public class User {
 
     private int id;
+
     private Set<Integer> friendsId = new HashSet<>();
+
     @Email
     private String email;
+
     @Pattern(regexp = "^[^ ]+$", message = "не должно содержать пробелов")
     private String login;
+
     private String name;
+
     @Past
     private LocalDate birthday;
 }

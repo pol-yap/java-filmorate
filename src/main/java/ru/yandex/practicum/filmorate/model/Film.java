@@ -17,16 +17,23 @@ public class Film {
     final static LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
 
     private int id;
+
     private Set<Integer> likes;
+
     @NotBlank
     private String name;
+
     @Size(max=MAX_DESCRIPTION_LENGTH)
     private String description;
+
     private LocalDate releaseDate;
+
     @Positive
     private int duration;
+
     @NotNull
     private Mpaa mpa;
+
     private Set<Genre> genres;
 
     public boolean isReleaseDateCorrect() {
