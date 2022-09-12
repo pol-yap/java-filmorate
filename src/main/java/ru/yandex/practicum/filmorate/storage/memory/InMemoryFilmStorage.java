@@ -25,7 +25,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> update(final int id, final Film film) {
+    public Optional<Film> update(final Film film) {
+        int id = film.getId();
         films.put(id, film);
 
         return findById(id);

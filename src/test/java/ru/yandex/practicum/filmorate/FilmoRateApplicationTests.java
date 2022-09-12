@@ -64,7 +64,7 @@ class FilmoRateApplicationTests {
         User storedUser = optionalUser.get();
         storedUser.setLogin("User1+");
 
-        Optional<User> updatedUser = userStorage.update(1, storedUser);
+        Optional<User> updatedUser = userStorage.update(storedUser);
         assertThat(updatedUser).isPresent()
                                .hasValueSatisfying((user) -> {
                                    assertThat(user).hasFieldOrPropertyWithValue("login", "User1+");
@@ -129,7 +129,7 @@ class FilmoRateApplicationTests {
         Film storedEntity = optionalEntity.get();
         storedEntity.setName("Film1+");
 
-        Optional<Film> updatedEntity = filmStorage.update(1, storedEntity);
+        Optional<Film> updatedEntity = filmStorage.update(storedEntity);
         assertThat(updatedEntity).isPresent()
                                .hasValueSatisfying((entity) -> {
                                    assertThat(entity).hasFieldOrPropertyWithValue("name", "Film1+");
@@ -197,7 +197,7 @@ class FilmoRateApplicationTests {
         Genre storedEntity = optionalEntity.get();
         storedEntity.setName("теперь такой жанр");
 
-        Optional<Genre> updatedEntity = genreStorage.update(1, storedEntity);
+        Optional<Genre> updatedEntity = genreStorage.update(storedEntity);
         assertThat(updatedEntity).isPresent()
                                  .hasValueSatisfying((entity) -> {
                                      assertThat(entity).hasFieldOrPropertyWithValue("name", "теперь такой жанр");
@@ -241,7 +241,7 @@ class FilmoRateApplicationTests {
         Mpaa storedEntity = optionalEntity.get();
         storedEntity.setName("XXX");
 
-        Optional<Mpaa> updatedEntity = mpaStorage.update(1, storedEntity);
+        Optional<Mpaa> updatedEntity = mpaStorage.update(storedEntity);
         assertThat(updatedEntity).isPresent()
                                  .hasValueSatisfying((entity) -> {
                                      assertThat(entity).hasFieldOrPropertyWithValue("name", "XXX");

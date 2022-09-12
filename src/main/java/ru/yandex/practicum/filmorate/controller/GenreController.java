@@ -33,6 +33,6 @@ public class GenreController {
 
     @PutMapping
     public Genre update(@Valid @RequestBody Genre genre) {
-        return service.update(genre.getId(), genre);
+        return service.update(genre);
     }
 }

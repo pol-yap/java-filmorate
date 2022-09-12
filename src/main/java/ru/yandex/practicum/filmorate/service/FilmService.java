@@ -30,10 +30,10 @@ public class FilmService {
                       .orElseThrow(()->new BadRequestException("Не удалось создать новый фильм"));
     }
 
-    public Film update(int id, Film film) {
-        throwExceptionIfNoSuchId(id);
+    public Film update(Film film) {
+        throwExceptionIfNoSuchId(film.getId());
 
-        return storage.update(id, film)
+        return storage.update(film)
                       .orElseThrow(()->new BadRequestException("Не удалось обновить данные о фильме"));
     }
 

@@ -28,7 +28,8 @@ public class MpaaDBStorage implements MPAStorage {
         return findById(id);
     }
 
-    public Optional<Mpaa> update(final int id, final Mpaa mpa) {
+    public Optional<Mpaa> update(final Mpaa mpa) {
+        int id = mpa.getId();
         String sql = "UPDATE mpaa SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, mpa.getName(), id);
 

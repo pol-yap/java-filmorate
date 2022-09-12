@@ -33,6 +33,6 @@ public class MpaaController {
 
     @PutMapping
     public Mpaa update(@Valid @RequestBody Mpaa mpa) {
-        return service.update(mpa.getId(), mpa);
+        return service.update(mpa);
     }
 }

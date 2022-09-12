@@ -22,11 +22,11 @@ public class UserService {
                       .orElseThrow(()->new BadRequestException("Не удалось создать нового пользователя"));
     }
 
-    public User update(int id, User user) {
-        throwExceptionIfNoSuchId(id);
+    public User update(User user) {
+        throwExceptionIfNoSuchId(user.getId());
         fixName(user);
 
-        return storage.update(id, user)
+        return storage.update(user)
                       .orElseThrow(()->new BadRequestException("Не удалось обновить данные пользователя"));
     }
 

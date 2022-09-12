@@ -39,7 +39,7 @@ public class UserController {
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
-        return service.update(user.getId(), user);
+        return service.update(user);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")

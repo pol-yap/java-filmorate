@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface UserStorage {
     Optional<User> create(final User user);
-    Optional<User> update(final int id, final User user);
+    Optional<User> update(final User user);
     Optional<User> findById(final int id);
     boolean isContainsId(final int id);
     List<User> findAll();

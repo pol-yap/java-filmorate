@@ -27,7 +27,8 @@ public class GenreDBStorage implements GenreStorage {
         return findById(id);
     }
 
-    public Optional<Genre> update(final int id, final Genre genre) {
+    public Optional<Genre> update(final Genre genre) {
+        int id = genre.getId();
         String sql = "UPDATE genres SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, genre.getName(), id);
 

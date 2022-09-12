@@ -22,7 +22,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User>  update(final int id, final User user) {
+    public Optional<User>  update(final User user) {
+        int id = user.getId();
         users.put(id, user);
 
         return findById(id);

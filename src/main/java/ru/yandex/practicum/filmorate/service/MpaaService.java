@@ -19,9 +19,9 @@ public class MpaaService {
                       .orElseThrow(()->new BadRequestException("Не удалось создать новый рейтинг MPAA"));
     }
 
-    public Mpaa update(int id, Mpaa mpa) {
-        throwExceptionIfNoSuchId(id);
-        return storage.update(id, mpa)
+    public Mpaa update(Mpaa mpa) {
+        throwExceptionIfNoSuchId(mpa.getId());
+        return storage.update(mpa)
                       .orElseThrow(()->new BadRequestException("Не удалось обновить рейтинг MPAA"));
     }
 

@@ -31,7 +31,8 @@ public class UserDBStorage implements UserStorage {
         return findById(id);
     }
 
-    public Optional<User> update(final int id, final User user) {
+    public Optional<User> update(final User user) {
+        int id = user.getId();
         String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
         jdbcTemplate.update(
                 sql,

@@ -38,7 +38,8 @@ public class FilmDBStorage implements FilmStorage {
         return findById(id);
     }
 
-    public Optional<Film> update(final int id, final Film film) {
+    public Optional<Film> update(final Film film) {
+        int id = film.getId();
         String sql = "UPDATE films " +
                 "SET name = ?, description = ?, release_date = ?, duration = ?, rating_id = ? " +
                 "WHERE id = ?";

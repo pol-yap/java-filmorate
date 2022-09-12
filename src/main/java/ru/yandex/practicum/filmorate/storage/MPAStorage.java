@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface MPAStorage {
     Optional<Mpaa> create(final Mpaa mpa);
-    Optional<Mpaa> update(final int id, final Mpaa mpa);
+    Optional<Mpaa> update(final Mpaa mpa);
     Optional<Mpaa> findById(final int id);
     boolean isContainsId(final int id);
     List<Mpaa> findAll();

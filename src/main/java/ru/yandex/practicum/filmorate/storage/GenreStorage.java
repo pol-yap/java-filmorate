@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface GenreStorage {
     Optional<Genre> create(final Genre genre);
-    Optional<Genre> update(final int id, final Genre genre);
+    Optional<Genre> update(final Genre genre);
     Optional<Genre> findById(final int id);
     boolean isContainsId(final int id);
     List<Genre> findAll();

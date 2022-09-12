@@ -19,9 +19,9 @@ public class GenreService {
                       .orElseThrow(()->new BadRequestException("Не удалось создать новый жанр"));
     }
 
-    public Genre update(int id, Genre genre) {
-        throwExceptionIfNoSuchId(id);
-        return storage.update(id, genre)
+    public Genre update(Genre genre) {
+        throwExceptionIfNoSuchId(genre.getId());
+        return storage.update(genre)
                       .orElseThrow(()->new BadRequestException("Не удалось обновить жанр"));
     }
 
