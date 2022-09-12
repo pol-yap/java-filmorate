@@ -1,27 +1,27 @@
 -- удалаяем структуру
-DROP TABLE IF EXISTS Friendship CASCADE;
-DROP TABLE IF EXISTS Likes CASCADE;
-DROP TABLE IF EXISTS Users CASCADE;
-DROP TABLE IF EXISTS Film CASCADE;
-DROP TABLE IF EXISTS Genre CASCADE;
-DROP TABLE IF EXISTS MPAA_rating CASCADE;
+DROP TABLE IF EXISTS friendship CASCADE;
+DROP TABLE IF EXISTS likes CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS films CASCADE;
+DROP TABLE IF EXISTS genres CASCADE;
+DROP TABLE IF EXISTS mpaa CASCADE;
 
 -- создаём заново
-CREATE TABLE IF NOT EXISTS MPAA_ratings(
+CREATE TABLE IF NOT EXISTS mpaa(
   id SERIAL PRIMARY KEY,
   name varchar,
 
   UNIQUE (name)
 );
 
-CREATE TABLE IF NOT EXISTS Genres(
+CREATE TABLE IF NOT EXISTS genres(
   id SERIAL PRIMARY KEY,
   name varchar,
 
   UNIQUE (name)
 );
 
-CREATE TABLE IF NOT EXISTS Films(
+CREATE TABLE IF NOT EXISTS films(
   id SERIAL PRIMARY KEY,
   name varchar NOT NULL,
   description varchar,
@@ -29,10 +29,10 @@ CREATE TABLE IF NOT EXISTS Films(
   duration int,
   rating_id int,
 
-  FOREIGN KEY (rating_id) REFERENCES MPAA_ratings(id)
+  FOREIGN KEY (rating_id) REFERENCES mpaa(id)
 );
 
-CREATE TABLE IF NOT EXISTS Users(
+CREATE TABLE IF NOT EXISTS users(
   id SERIAL PRIMARY KEY,
   email varchar,
   login varchar NOT NULL,
@@ -40,31 +40,31 @@ CREATE TABLE IF NOT EXISTS Users(
   birthday date
 );
 
-CREATE TABLE IF NOT EXISTS Friendship(
+CREATE TABLE IF NOT EXISTS friendship(
   friending_id int,
   friended_id int,
 
   PRIMARY KEY (friending_id, friended_id),
-  FOREIGN KEY (friending_id) REFERENCES Users(id),
-  FOREIGN KEY (friended_id) REFERENCES Users(id)
+  FOREIGN KEY (friending_id) REFERENCES users(id),
+  FOREIGN KEY (friended_id) REFERENCES users(id)
 );
 
-CREATE TABLE IF NOT EXISTS Likes(
+CREATE TABLE IF NOT EXISTS likes(
   film_id int,
   user_id int,
 
   PRIMARY KEY (film_id, user_id),
-  FOREIGN KEY (film_id) REFERENCES Films(id),
-  FOREIGN KEY (user_id) REFERENCES Users(id)
+  FOREIGN KEY (film_id) REFERENCES films(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE IF NOT EXISTS Film_genres(
+CREATE TABLE IF NOT EXISTS film_genres(
   film_id int,
   genre_id int,
 
   PRIMARY KEY (film_id, genre_id),
-  FOREIGN KEY (film_id) REFERENCES Films(id),
-  FOREIGN KEY (genre_id) REFERENCES Genres(id)
+  FOREIGN KEY (film_id) REFERENCES films(id),
+  FOREIGN KEY (genre_id) REFERENCES genres(id)
 );
 
 

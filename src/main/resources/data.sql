@@ -1,4 +1,4 @@
-INSERT INTO MPAA_ratings (name)
+INSERT INTO mpaa (name)
 VALUES
 ('G'),
 ('PG'),
@@ -6,7 +6,7 @@ VALUES
 ('R'),
 ('NC-17');
 
-INSERT INTO Genres (name)
+INSERT INTO genres (name)
 VALUES
 ('Комедия'),
 ('Драма'),

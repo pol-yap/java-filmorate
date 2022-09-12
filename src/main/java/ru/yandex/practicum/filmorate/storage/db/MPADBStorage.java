@@ -20,7 +20,7 @@ public class MPADBStorage implements MPAStorage {
 
     public Optional<MPA> create(final MPA mpa) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("MPAA_ratings")
+                .withTableName("mpaa")
                 .usingGeneratedKeyColumns("id");
         int id = simpleJdbcInsert.executeAndReturnKey(mpaToMap(mpa)).intValue();
         mpa.setId(id);
@@ -29,14 +29,14 @@ public class MPADBStorage implements MPAStorage {
     }
 
     public Optional<MPA> update(final int id, final MPA mpa) {
-        String sql = "UPDATE MPAA_ratings SET name = ? WHERE id = ?";
+        String sql = "UPDATE mpaa SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, mpa.getName(), id);
 
         return findById(id);
     }
 
     public Optional<MPA> findById(final int id) {
-        String sql = "SELECT * FROM MPAA_ratings Films WHERE id = ?";
+        String sql = "SELECT * FROM mpaa Films WHERE id = ?";
 
         return jdbcTemplate.query(sql, this::rowToMPA, id)
                            .stream()
@@ -44,14 +44,14 @@ public class MPADBStorage implements MPAStorage {
     }
 
     public boolean isContainsId(final int id) {
-        String sql = "SELECT Count(id) FROM MPAA_ratings WHERE id =?";
+        String sql = "SELECT Count(id) FROM mpaa WHERE id =?";
         Integer found = jdbcTemplate.queryForObject(sql, Integer.class, id);
 
         return found == 1;
     }
 
     public List<MPA> findAll() {
-        String sql = "SELECT * FROM MPAA_ratings";
+        String sql = "SELECT * FROM mpaa";
 
         return jdbcTemplate.query(sql, this::rowToMPA);
     }

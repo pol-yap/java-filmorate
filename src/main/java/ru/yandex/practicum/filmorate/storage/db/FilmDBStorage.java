@@ -29,7 +29,7 @@ public class FilmDBStorage implements FilmStorage {
 
     public Optional<Film> create(final Film film) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("Films")
+                .withTableName("films")
                 .usingGeneratedKeyColumns("id");
         int id = simpleJdbcInsert.executeAndReturnKey(filmToMap(film)).intValue();
         film.setId(id);
@@ -39,7 +39,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     public Optional<Film> update(final int id, final Film film) {
-        String sql = "UPDATE Films " +
+        String sql = "UPDATE films " +
                 "SET name = ?, description = ?, release_date = ?, duration = ?, rating_id = ? " +
                 "WHERE id = ?";
         jdbcTemplate.update(sql,
@@ -55,8 +55,8 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     public Optional<Film> findById(final int id) {
-        String sql = "SELECT *, MPA.name AS rating_name " +
-                "FROM Films LEFT JOIN MPAA_Ratings MPA ON Films.rating_id = MPA.id WHERE Films.id = ?";
+        String sql = "SELECT *, mpaa.name AS rating_name " +
+                "FROM films LEFT JOIN mpaa ON films.rating_id = mpaa.id WHERE films.id = ?";
         return jdbcTemplate.query(sql, this::rowToFilm, id)
                            .stream()
                            .peek(this::loadGenres)
@@ -65,15 +65,15 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     public boolean isContainsId(final int id) {
-        String sql = "SELECT Count(id) FROM Films WHERE id =?";
+        String sql = "SELECT Count(id) FROM films WHERE id =?";
         Integer found = jdbcTemplate.queryForObject(sql, Integer.class, id);
 
         return found == 1;
     }
 
     public List<Film> findAll() {
-        String sql = "SELECT *, MPA.name AS rating_name " +
-                "FROM Films LEFT JOIN MPAA_Ratings MPA ON Films.rating_id = MPA.id";
+        String sql = "SELECT *, mpaa.name AS rating_name " +
+                "FROM films LEFT JOIN mpaa ON films.rating_id = mpaa.id";
 
         return jdbcTemplate.query(sql, this::rowToFilm)
                            .stream()
@@ -83,20 +83,20 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     public void addLike(final int filmId, final int userId) {
-        String sql = "INSERT INTO Likes (film_id, user_id) VALUES (?, ?)";
+        String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, filmId, userId);
     }
 
     public void removeLike(final int filmId, final int userId) {
-        String sql = "DELETE FROM Likes WHERE film_id = ? AND user_id = ?";
+        String sql = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sql, filmId, userId);
     }
 
     public List<Film> getTop(final int count) {
-        String sql = "SELECT Films.*, MPA.name AS rating_name, Count(Likes.user_id) AS likes_count " +
-                "FROM Films JOIN MPAA_Ratings MPA ON Films.rating_id = MPA.id " +
-                "LEFT JOIN Likes ON Films.id = Likes.film_id " +
-                "GROUP BY Films.id " +
+        String sql = "SELECT films.*, mpaa.name AS rating_name, Count(likes.user_id) AS likes_count " +
+                "FROM films JOIN mpaa ON films.rating_id = mpaa.id " +
+                "LEFT JOIN likes ON films.id = likes.film_id " +
+                "GROUP BY films.id " +
                 "ORDER BY likes_count DESC " +
                 "LIMIT ?";
 
@@ -134,12 +134,12 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     private void loadLikes(final Film film) {
-        String sql = "SELECT user_id FROM Likes WHERE film_id = ?";
+        String sql = "SELECT user_id FROM likes WHERE film_id = ?";
         film.setLikes(new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, film.getId())));
     }
 
     private void saveGenres(final Film film) {
-        String sql = "DELETE FROM Film_genres WHERE film_id = ?";
+        String sql = "DELETE FROM film_genres WHERE film_id = ?";
         jdbcTemplate.update(sql, film.getId());
 
         if (film.getGenres() == null) {
@@ -150,7 +150,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     private void saveGenre(final Film film, final Genre genre) {
-        String sql = "INSERT INTO Film_genres (film_id, genre_id) VALUES (?, ?)";
+        String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
         try {
             jdbcTemplate.update(sql, film.getId(), genre.getId());
         } catch (DataAccessException e) {

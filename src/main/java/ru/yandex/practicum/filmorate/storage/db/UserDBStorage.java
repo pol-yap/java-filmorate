@@ -24,7 +24,7 @@ public class UserDBStorage implements UserStorage {
 
     public Optional<User> create(final User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("Users")
+                .withTableName("users")
                 .usingGeneratedKeyColumns("id");
         int id = simpleJdbcInsert.executeAndReturnKey(userToMap(user)).intValue();
 
@@ -32,7 +32,7 @@ public class UserDBStorage implements UserStorage {
     }
 
     public Optional<User> update(final int id, final User user) {
-        String sql = "UPDATE Users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
+        String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
         jdbcTemplate.update(
                 sql,
                 user.getEmail(),
@@ -45,7 +45,7 @@ public class UserDBStorage implements UserStorage {
     }
 
     public Optional<User> findById(final int id) {
-        String sql = "SELECT * FROM Users WHERE id = ?";
+        String sql = "SELECT * FROM users WHERE id = ?";
         return jdbcTemplate.query(sql, this::rowToUser, id)
                            .stream()
                            .peek(this::loadFriendsId)
@@ -53,14 +53,14 @@ public class UserDBStorage implements UserStorage {
     }
 
     public boolean isContainsId(final int id) {
-        String sql = "SELECT Count(id) FROM Users WHERE id = ?";
+        String sql = "SELECT Count(id) FROM users WHERE id = ?";
         Integer found = jdbcTemplate.queryForObject(sql, Integer.class, id);
 
         return found == 1;
     }
 
     public List<User> findAll() {
-        String sql = "SELECT * FROM Users";
+        String sql = "SELECT * FROM users";
 
         return jdbcTemplate.query(sql, this::rowToUser)
                            .stream()
@@ -69,24 +69,24 @@ public class UserDBStorage implements UserStorage {
     }
 
     public void addFriend(final int friendId, final int userId) {
-        String sql = "INSERT INTO Friendship (friending_id, friended_id) VALUES (?, ?)";
+        String sql = "INSERT INTO friendship (friending_id, friended_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, userId, friendId);
     }
 
     public void removeFriend(final int friendId, final int userId) {
-        String sql = "DELETE FROM Friendship WHERE friending_id = ? AND friended_id = ?";
+        String sql = "DELETE FROM friendship WHERE friending_id = ? AND friended_id = ?";
         jdbcTemplate.update(sql, userId, friendId);
     }
 
     public List<Integer> getFriendsId(final int id) {
-        String sql = "SELECT friending_id FROM Friendship WHERE friended_id = ?";
+        String sql = "SELECT friending_id FROM friendship WHERE friended_id = ?";
 
         return jdbcTemplate.queryForList(sql, Integer.class, id);
     }
 
     public List<User> getFriends(final int id) {
-        String sql = "SELECT Users.* FROM Users " +
-                "JOIN Friendship ON Users.id = Friendship.friending_id " +
+        String sql = "SELECT users.* FROM users " +
+                "JOIN friendship ON users.id = friendship.friending_id " +
                 "WHERE friended_id = ?";
 
         return jdbcTemplate.query(sql, this::rowToUser, id)
@@ -96,9 +96,9 @@ public class UserDBStorage implements UserStorage {
     }
 
     public List<User> getCommonFriends(final int id1, final int id2) {
-        String sql = "SELECT Users.* FROM Friendship f1 " +
-                "JOIN Friendship f2 ON (f1.friending_id = f2.friending_id AND f1.friended_id = ? AND f2.friended_id = ?) " +
-                "JOIN Users ON Users.id = f1.friending_id";
+        String sql = "SELECT users.* FROM friendship f1 " +
+                "JOIN friendship f2 ON (f1.friending_id = f2.friending_id AND f1.friended_id = ? AND f2.friended_id = ?) " +
+                "JOIN users ON users.id = f1.friending_id";
 
         return jdbcTemplate.query(sql, this::rowToUser, id1, id2)
                            .stream()
