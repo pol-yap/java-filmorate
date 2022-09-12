@@ -4,34 +4,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.storage.MPAStorage;
 
 import java.util.List;
 
 @Service
-public class MPAService {
+public class MpaaService {
     @Autowired
     private MPAStorage storage;
 
-    public MPA create(MPA mpa) {
+    public Mpaa create(Mpaa mpa) {
         return storage.create(mpa)
                       .orElseThrow(()->new BadRequestException("Не удалось создать новый рейтинг MPAA"));
     }
 
-    public MPA update(int id, MPA mpa) {
+    public Mpaa update(int id, Mpaa mpa) {
         throwExceptionIfNoSuchId(id);
         return storage.update(id, mpa)
                       .orElseThrow(()->new BadRequestException("Не удалось обновить рейтинг MPAA"));
     }
 
-    public MPA findById(int id) {
+    public Mpaa findById(int id) {
         throwExceptionIfNoSuchId(id);
         return storage.findById(id)
                       .orElseThrow(()->new NotFoundException(id, "рейтинг MPAA"));
     }
 
-    public List<MPA> findAll() {
+    public List<Mpaa> findAll() {
         return storage.findAll();
     }
 

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.storage.MPAStorage;
 
 import java.sql.ResultSet;
@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class MPADBStorage implements MPAStorage {
+public class MpaaDBStorage implements MPAStorage {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    public Optional<MPA> create(final MPA mpa) {
+    public Optional<Mpaa> create(final Mpaa mpa) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("mpaa")
                 .usingGeneratedKeyColumns("id");
@@ -28,14 +28,14 @@ public class MPADBStorage implements MPAStorage {
         return findById(id);
     }
 
-    public Optional<MPA> update(final int id, final MPA mpa) {
+    public Optional<Mpaa> update(final int id, final Mpaa mpa) {
         String sql = "UPDATE mpaa SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, mpa.getName(), id);
 
         return findById(id);
     }
 
-    public Optional<MPA> findById(final int id) {
+    public Optional<Mpaa> findById(final int id) {
         String sql = "SELECT * FROM mpaa Films WHERE id = ?";
 
         return jdbcTemplate.query(sql, this::rowToMPA, id)
@@ -50,18 +50,18 @@ public class MPADBStorage implements MPAStorage {
         return found == 1;
     }
 
-    public List<MPA> findAll() {
+    public List<Mpaa> findAll() {
         String sql = "SELECT * FROM mpaa";
 
         return jdbcTemplate.query(sql, this::rowToMPA);
     }
 
-    private Map<String, Object> mpaToMap(final MPA mpa) {
-        return Map.of("name", mpa.getName());
+    private Map<String, Object> mpaToMap(final Mpaa mpaa) {
+        return Map.of("name", mpaa.getName());
     }
 
-    private MPA rowToMPA(final ResultSet resultSet, final int rowNum) throws SQLException {
-        return new MPA(
+    private Mpaa rowToMPA(final ResultSet resultSet, final int rowNum) throws SQLException {
+        return new Mpaa(
                 resultSet.getInt("id"),
                 resultSet.getString("name")
         );

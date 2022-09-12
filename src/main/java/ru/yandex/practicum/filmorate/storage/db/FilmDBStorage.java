@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
@@ -124,7 +124,7 @@ public class FilmDBStorage implements FilmStorage {
                    .description(resultSet.getString("description"))
                    .releaseDate(resultSet.getDate("release_date").toLocalDate())
                    .duration(resultSet.getInt("duration"))
-                   .mpa(new MPA(resultSet.getInt("rating_id"),
+                   .mpa(new Mpaa(resultSet.getInt("rating_id"),
                                 resultSet.getString("rating_name")))
                    .build();
     }

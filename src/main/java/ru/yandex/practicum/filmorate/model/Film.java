@@ -6,8 +6,6 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -28,7 +26,7 @@ public class Film {
     @Positive
     private int duration;
     @NotNull
-    private MPA mpa;
+    private Mpaa mpa;
     private Set<Genre> genres;
 
     public boolean isReleaseDateCorrect() {

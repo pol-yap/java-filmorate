@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.MPAStorage;
@@ -101,7 +101,7 @@ class FilmoRateApplicationTests {
                                                         .description("mail@server.io")
                                                         .duration(130)
                                                         .releaseDate(LocalDate.of(1993, 1, 1))
-                                                        .mpa(new MPA(1, ""))
+                                                        .mpa(new Mpaa(1, ""))
                                                         .build());
 
         assertThat(newEntity).isPresent()
@@ -214,7 +214,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testCreateMPA() {
-        Optional<MPA> newEntity = mpaStorage.create(new MPA(0, "EX"));
+        Optional<Mpaa> newEntity = mpaStorage.create(new Mpaa(0, "EX"));
 
         assertThat(newEntity).isPresent()
                              .hasValueSatisfying((entity) -> {
@@ -225,7 +225,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testFindMPAById() {
-        Optional<MPA> optionalEntity = mpaStorage.findById(1);
+        Optional<Mpaa> optionalEntity = mpaStorage.findById(1);
 
         assertThat(optionalEntity).isPresent()
                                   .hasValueSatisfying((entity) -> {
@@ -235,13 +235,13 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testUpdateMPA() {
-        Optional<MPA> optionalEntity = mpaStorage.findById(1);
+        Optional<Mpaa> optionalEntity = mpaStorage.findById(1);
         assertThat(optionalEntity).isPresent();
 
-        MPA storedEntity = optionalEntity.get();
+        Mpaa storedEntity = optionalEntity.get();
         storedEntity.setName("XXX");
 
-        Optional<MPA> updatedEntity = mpaStorage.update(1, storedEntity);
+        Optional<Mpaa> updatedEntity = mpaStorage.update(1, storedEntity);
         assertThat(updatedEntity).isPresent()
                                  .hasValueSatisfying((entity) -> {
                                      assertThat(entity).hasFieldOrPropertyWithValue("name", "XXX");
@@ -251,7 +251,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testFindAllMPA() {
-        List<MPA> entities = mpaStorage.findAll();
+        List<Mpaa> entities = mpaStorage.findAll();
 
         assertThat(entities).hasSize(5);
     }
