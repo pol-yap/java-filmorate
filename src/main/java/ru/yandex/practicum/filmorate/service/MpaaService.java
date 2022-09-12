@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpaa;
-import ru.yandex.practicum.filmorate.storage.MPAStorage;
+import ru.yandex.practicum.filmorate.storage.MpaaStorage;
 
 import java.util.List;
 
 @Service
 public class MpaaService {
     @Autowired
-    private MPAStorage storage;
+    private MpaaStorage storage;
 
     public Mpaa create(Mpaa mpa) {
         return storage.create(mpa)

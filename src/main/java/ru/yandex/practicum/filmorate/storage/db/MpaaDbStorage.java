@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Mpaa;
-import ru.yandex.practicum.filmorate.storage.MPAStorage;
+import ru.yandex.practicum.filmorate.storage.MpaaStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class MpaaDbStorage implements MPAStorage {
+public class MpaaDbStorage implements MpaaStorage {
     @Autowired
     JdbcTemplate jdbcTemplate;
 

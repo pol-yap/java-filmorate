@@ -40,6 +40,12 @@ public class FilmController {
         return service.create(film);
     }
 
+    @DeleteMapping("/{filmId}")
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void delete(@PathVariable int filmId) {
+        service.delete(filmId);
+    }
+
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         return service.update(film);

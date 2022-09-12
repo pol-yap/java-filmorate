@@ -7,8 +7,9 @@ import java.util.Optional;
 
 public interface UserStorage {
     Optional<User> create(final User user);
-    Optional<User> update(final User user);
     Optional<User> findById(final int id);
+    Optional<User> update(final User user);
+    void delete(final int id);
     boolean isContainsId(final int id);
     List<User> findAll();
     void addFriend(final int userId, final int friendId);

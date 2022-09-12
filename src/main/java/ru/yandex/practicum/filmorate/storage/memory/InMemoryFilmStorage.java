@@ -38,6 +38,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void delete(final int id) {
+        films.remove(id);
+    }
+
+    @Override
     public List<Film> findAll() {
         return List.copyOf(films.values());
     }

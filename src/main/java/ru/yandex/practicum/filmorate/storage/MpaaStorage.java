@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.model.Mpaa;
 import java.util.List;
 import java.util.Optional;
 
-public interface MPAStorage {
+public interface MpaaStorage {
     Optional<Mpaa> create(final Mpaa mpa);
     Optional<Mpaa> update(final Mpaa mpa);
     Optional<Mpaa> findById(final int id);

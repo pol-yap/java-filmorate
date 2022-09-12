@@ -53,6 +53,11 @@ public class UserDbStorage implements UserStorage {
                            .findFirst();
     }
 
+    public void delete(final int id) {
+        String sql = "DElETE FROM users WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
     public boolean isContainsId(final int id) {
         String sql = "SELECT Count(id) FROM users WHERE id = ?";
         Integer found = jdbcTemplate.queryForObject(sql, Integer.class, id);

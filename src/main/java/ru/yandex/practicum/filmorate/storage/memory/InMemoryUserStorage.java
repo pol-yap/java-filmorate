@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.memory;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -22,11 +23,16 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User>  update(final User user) {
+    public Optional<User> update(final User user) {
         int id = user.getId();
         users.put(id, user);
 
         return findById(id);
+    }
+
+    @Override
+    public void delete(final int id) {
+        users.remove(id);
     }
 
     @Override

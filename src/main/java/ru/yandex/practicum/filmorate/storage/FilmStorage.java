@@ -7,8 +7,9 @@ import java.util.Optional;
 
 public interface FilmStorage {
     Optional<Film> create(final Film film);
-    Optional<Film> update(final Film film);
     Optional<Film> findById(final int id);
+    Optional<Film> update(final Film film);
+    void delete(final int id);
     boolean isContainsId(final int id);
     List<Film> findAll();
     void addLike(final int filmId, final int userId);

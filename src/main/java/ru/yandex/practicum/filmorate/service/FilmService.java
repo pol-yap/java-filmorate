@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class FilmService {
     @Autowired
-    @Qualifier("filmDBStorage")
+    @Qualifier("filmDbStorage")
     private FilmStorage storage;
 
     @Autowired
@@ -35,6 +35,10 @@ public class FilmService {
 
         return storage.update(film)
                       .orElseThrow(()->new BadRequestException("Не удалось обновить данные о фильме"));
+    }
+
+    public void delete(final int id) {
+        storage.delete(id);
     }
 
     public List<Film> findAll() {

@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.MPAStorage;
+import ru.yandex.practicum.filmorate.storage.MpaaStorage;
 import ru.yandex.practicum.filmorate.storage.db.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
 
@@ -28,7 +28,7 @@ class FilmoRateApplicationTests {
     private final UserDbStorage userStorage;
     private final FilmDbStorage filmStorage;
     private final GenreStorage genreStorage;
-    private final MPAStorage mpaStorage;
+    private final MpaaStorage mpaaStorage;
 
     @Test
     public void testCreateUser() {
@@ -138,6 +138,13 @@ class FilmoRateApplicationTests {
     }
 
     @Test
+    public void testDeleteFilm() {
+        filmStorage.delete(1);
+        Optional<Film> optionalEntity = filmStorage.findById(1);
+        assertThat(optionalEntity).isNotPresent();
+    }
+
+    @Test
     public void testFindAllFilms() {
         List<Film> entities = filmStorage.findAll();
 
@@ -214,7 +221,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testCreateMPA() {
-        Optional<Mpaa> newEntity = mpaStorage.create(new Mpaa(0, "EX"));
+        Optional<Mpaa> newEntity = mpaaStorage.create(new Mpaa(0, "EX"));
 
         assertThat(newEntity).isPresent()
                              .hasValueSatisfying((entity) -> {
@@ -225,7 +232,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testFindMPAById() {
-        Optional<Mpaa> optionalEntity = mpaStorage.findById(1);
+        Optional<Mpaa> optionalEntity = mpaaStorage.findById(1);
 
         assertThat(optionalEntity).isPresent()
                                   .hasValueSatisfying((entity) -> {
@@ -235,13 +242,13 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testUpdateMPA() {
-        Optional<Mpaa> optionalEntity = mpaStorage.findById(1);
+        Optional<Mpaa> optionalEntity = mpaaStorage.findById(1);
         assertThat(optionalEntity).isPresent();
 
         Mpaa storedEntity = optionalEntity.get();
         storedEntity.setName("XXX");
 
-        Optional<Mpaa> updatedEntity = mpaStorage.update(storedEntity);
+        Optional<Mpaa> updatedEntity = mpaaStorage.update(storedEntity);
         assertThat(updatedEntity).isPresent()
                                  .hasValueSatisfying((entity) -> {
                                      assertThat(entity).hasFieldOrPropertyWithValue("name", "XXX");
@@ -251,7 +258,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testFindAllMPA() {
-        List<Mpaa> entities = mpaStorage.findAll();
+        List<Mpaa> entities = mpaaStorage.findAll();
 
         assertThat(entities).hasSize(5);
     }

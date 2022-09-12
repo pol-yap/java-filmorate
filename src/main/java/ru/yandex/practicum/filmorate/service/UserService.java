@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class UserService {
     @Autowired
-    @Qualifier("userDBStorage")
+    @Qualifier("userDbStorage")
     private UserStorage storage;
 
     public User create(User user) {
@@ -28,6 +28,10 @@ public class UserService {
 
         return storage.update(user)
                       .orElseThrow(()->new BadRequestException("Не удалось обновить данные пользователя"));
+    }
+
+    public void delete(final int id) {
+        storage.delete(id);
     }
 
     public User findById(int id) {
