@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS genres(
 
 CREATE TABLE IF NOT EXISTS films(
   id SERIAL PRIMARY KEY,
-  name varchar NOT NULL,
+  name varchar(200) NOT NULL,
   description varchar,
   release_date date,
   duration int,
