@@ -10,17 +10,16 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Slf4j
 @Repository
 public class UserDbStorage implements UserStorage {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private FriendDbStorage friendStorage;
 
     public Optional<User> create(final User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
@@ -48,9 +47,8 @@ public class UserDbStorage implements UserStorage {
     public Optional<User> findById(final int id) {
         String sql = "SELECT * FROM users WHERE id = ?";
         return jdbcTemplate.query(sql, this::rowToUser, id)
-                           .stream()
-                           .peek(this::loadFriendsId)
-                           .findFirst();
+                                                  .stream()
+                                                  .findFirst();
     }
 
     public void delete(final int id) {
@@ -68,26 +66,7 @@ public class UserDbStorage implements UserStorage {
     public List<User> findAll() {
         String sql = "SELECT * FROM users";
 
-        return jdbcTemplate.query(sql, this::rowToUser)
-                           .stream()
-                           .peek(this::loadFriendsId)
-                           .collect(Collectors.toList());
-    }
-
-    public void addFriend(final int friendId, final int userId) {
-        String sql = "INSERT INTO friendship (friending_id, friended_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql, userId, friendId);
-    }
-
-    public void removeFriend(final int friendId, final int userId) {
-        String sql = "DELETE FROM friendship WHERE friending_id = ? AND friended_id = ?";
-        jdbcTemplate.update(sql, userId, friendId);
-    }
-
-    public List<Integer> getFriendsId(final int id) {
-        String sql = "SELECT friending_id FROM friendship WHERE friended_id = ?";
-
-        return jdbcTemplate.queryForList(sql, Integer.class, id);
+        return new ArrayList<>(jdbcTemplate.query(sql, this::rowToUser));
     }
 
     public List<User> getFriends(final int id) {
@@ -95,10 +74,7 @@ public class UserDbStorage implements UserStorage {
                 "JOIN friendship ON users.id = friendship.friending_id " +
                 "WHERE friended_id = ?";
 
-        return jdbcTemplate.query(sql, this::rowToUser, id)
-                           .stream()
-                           .peek(this::loadFriendsId)
-                           .collect(Collectors.toList());
+        return jdbcTemplate.query(sql, this::rowToUser, id);
     }
 
     public List<User> getCommonFriends(final int id1, final int id2) {
@@ -106,10 +82,7 @@ public class UserDbStorage implements UserStorage {
                 "JOIN friendship f2 ON (f1.friending_id = f2.friending_id AND f1.friended_id = ? AND f2.friended_id = ?) " +
                 "JOIN users ON users.id = f1.friending_id";
 
-        return jdbcTemplate.query(sql, this::rowToUser, id1, id2)
-                           .stream()
-                           .peek(this::loadFriendsId)
-                           .collect(Collectors.toList());
+        return jdbcTemplate.query(sql, this::rowToUser, id1, id2);
     }
 
     private Map<String, Object> userToMap(final User user) {
@@ -130,7 +103,10 @@ public class UserDbStorage implements UserStorage {
                    .build();
     }
 
-    private void loadFriendsId(final User user) {
-        user.setFriendsId(new HashSet<>(getFriendsId(user.getId())));
-    }
+//    private void loadFriendsId(final User user, Map<Integer, Integer> friends) {
+//        friends.keySet()
+//               .stream()
+//               .filter(key -> key == user.getId())
+//               .forEach(key -> user.getFriendsId().add(friends.get(key)));
+//    }
 }

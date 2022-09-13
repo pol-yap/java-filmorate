@@ -12,7 +12,7 @@ public interface FilmStorage {
     void delete(final int id);
     boolean isContainsId(final int id);
     List<Film> findAll();
-    void addLike(final int filmId, final int userId);
-    void removeLike(final int filmId, final int userId);
+//    void addLike(final int filmId, final int userId);
+//    void removeLike(final int filmId, final int userId);
     List<Film> getTop(final int count);
 }

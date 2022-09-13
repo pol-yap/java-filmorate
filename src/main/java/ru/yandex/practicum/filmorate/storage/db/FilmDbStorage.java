@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.LikeStorage;
 
 @Slf4j
 @Repository
@@ -26,6 +27,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Autowired
     private GenreStorage genreStorage;
+
+    @Autowired
+    private LikeStorage likeStorage;
 
     public Optional<Film> create(final Film film) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
@@ -60,8 +64,6 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM films LEFT JOIN mpaa ON films.rating_id = mpaa.id WHERE films.id = ?";
         return jdbcTemplate.query(sql, this::rowToFilm, id)
                            .stream()
-                           .peek(this::loadGenres)
-                           .peek(this::loadLikes)
                            .findFirst();
     }
 
@@ -83,19 +85,9 @@ public class FilmDbStorage implements FilmStorage {
 
         return jdbcTemplate.query(sql, this::rowToFilm)
                            .stream()
-                           .peek(this::loadGenres)
-                           .peek(this::loadLikes)
+//                           .peek(this::loadGenres)
+//                           .peek(this::loadLikes)
                            .collect(Collectors.toList());
-    }
-
-    public void addLike(final int filmId, final int userId) {
-        String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql, filmId, userId);
-    }
-
-    public void removeLike(final int filmId, final int userId) {
-        String sql = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
-        jdbcTemplate.update(sql, filmId, userId);
     }
 
     public List<Film> getTop(final int count) {

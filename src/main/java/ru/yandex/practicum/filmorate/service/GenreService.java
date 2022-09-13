@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class GenreService {
@@ -29,6 +30,10 @@ public class GenreService {
         throwExceptionIfNoSuchId(id);
         return storage.findById(id)
                       .orElseThrow(()->new NotFoundException(id, "жанр"));
+    }
+
+    public Set<Genre> findByFilm(final int filmId) {
+        return storage.findByFilm(filmId);
     }
 
     public List<Genre> findAll() {

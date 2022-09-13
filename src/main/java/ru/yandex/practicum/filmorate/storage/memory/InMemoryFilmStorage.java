@@ -52,12 +52,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.containsKey(id);
     }
 
-    @Override
     public void addLike(int filmId, int userId) {
         films.get(filmId).getLikes().add(userId);
     }
 
-    @Override
     public void removeLike(int filmId, int userId) {
         films.get(filmId).getLikes().remove(userId);
     }

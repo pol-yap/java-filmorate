@@ -7,13 +7,19 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+
+import java.awt.desktop.OpenFilesEvent;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
     @Autowired
     @Qualifier("userDbStorage")
     private UserStorage storage;
+
+    @Autowired
+    private FriendService friendService;
 
     public User create(User user) {
         fixName(user);
@@ -35,8 +41,11 @@ public class UserService {
     }
 
     public User findById(int id) {
-        return storage.findById(id)
-                      .orElseThrow(()->new NotFoundException(id, "пользователь"));
+        User user = storage.findById(id)
+                           .orElseThrow(() -> new NotFoundException(id, "пользователь"));
+        user.setFriendsId(friendService.getFriendsId(user.getId()));
+
+        return user;
     }
 
     public List<User> findAll() {
@@ -46,13 +55,13 @@ public class UserService {
     public void addFriend(int userId, int friendId) {
         throwExceptionIfNoSuchId(userId);
         throwExceptionIfNoSuchId(friendId);
-        storage.addFriend(userId, friendId);
+        friendService.addFriend(userId, friendId);
     }
 
     public void removeFriend(int userId, int friendId) {
         throwExceptionIfNoSuchId(userId);
         throwExceptionIfNoSuchId(friendId);
-        storage.removeFriend(userId, friendId);
+        friendService.removeFriend(userId, friendId);
     }
 
     public List<User> getFriends(int id) {

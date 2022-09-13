@@ -19,6 +19,12 @@ public class FilmService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private GenreService genreService;
+
+    @Autowired
+    private LikeService likeService;
+
     public Film create(Film film) {
         if (! film.isReleaseDateCorrect()) {
             throw new BadRequestException(String.format(
@@ -26,15 +32,21 @@ public class FilmService {
                     film.getReleaseDate()));
         }
 
-        return storage.create(film)
-                      .orElseThrow(()->new BadRequestException("Не удалось создать новый фильм"));
+        Film createdFilm =  storage.create(film)
+                                   .orElseThrow(()->new BadRequestException("Не удалось создать новый фильм"));
+        enrichByLinkedData(createdFilm);
+
+        return createdFilm;
     }
 
     public Film update(Film film) {
         throwExceptionIfNoSuchId(film.getId());
 
-        return storage.update(film)
-                      .orElseThrow(()->new BadRequestException("Не удалось обновить данные о фильме"));
+        Film updatedFilm =  storage.update(film)
+                                   .orElseThrow(()->new BadRequestException("Не удалось обновить данные о фильме"));
+        enrichByLinkedData(updatedFilm);
+
+        return updatedFilm;
     }
 
     public void delete(final int id) {
@@ -48,20 +60,23 @@ public class FilmService {
     public Film findById(int id) {
         throwExceptionIfNoSuchId(id);
 
-        return storage.findById(id)
-                      .orElseThrow(()->new NotFoundException(id, "фильм"));
+        Film film = storage.findById(id)
+                           .orElseThrow(()->new NotFoundException(id, "фильм"));
+        enrichByLinkedData(film);
+
+        return film;
     }
 
     public void addLike(int filmId, int userId) {
         throwExceptionIfNoSuchId(filmId);
         userService.throwExceptionIfNoSuchId(userId);
-        storage.addLike(filmId, userId);
+        likeService.addLike(filmId, userId);
     }
 
     public void removeLike(int filmId, int userId) {
         throwExceptionIfNoSuchId(filmId);
         userService.throwExceptionIfNoSuchId(userId);
-        storage.removeLike(filmId, userId);
+        likeService.removeLike(filmId, userId);
     }
 
     public List<Film> getTop(int count) {
@@ -72,5 +87,10 @@ public class FilmService {
         if (! storage.isContainsId(id)) {
             throw new NotFoundException(id, "фильм");
         }
+    }
+
+    private void enrichByLinkedData(Film film) {
+        film.setGenres(genreService.findByFilm(film.getId()));
+        film.setLikes(likeService.findByFilm(film.getId()));
     }
 }

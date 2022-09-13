@@ -50,7 +50,6 @@ public class InMemoryUserStorage implements UserStorage {
         return users.containsKey(id);
     }
 
-    @Override
     public void addFriend(final int userId, final int friendId) {
         users.get(userId).getFriendsId().add(friendId);
     }
@@ -66,10 +65,6 @@ public class InMemoryUserStorage implements UserStorage {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
-    }
-
-    public List<Integer> getFriendsId(final int id) {
-        return new ArrayList<>(users.get(id).getFriendsId());
     }
 
     public List<User> getCommonFriends(final int id, final int otherId) {
