@@ -7,9 +7,9 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
-public class Mpaa {
-    private int id;
+public class SimpleEntity {
+    protected int id;
 
     @NotBlank
-    private String name;
+    protected String name;
 }

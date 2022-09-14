@@ -6,6 +6,6 @@ import java.util.Set;
 public interface FriendStorage {
     void addFriend(int friendingId, int friendedId);
     void removeFriend(int friendingId, int friendedId);
-    Set<Integer> getFriends(int userId);
+    Set<Integer> getFriendIds(int userId);
     Map<Integer, Integer> findAll();
 }

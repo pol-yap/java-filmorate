@@ -20,6 +20,6 @@ public class FriendService {
     }
 
     public Set<Integer> getFriendsId(final int userId) {
-        return storage.getFriends(userId);
+        return storage.getFriendIds(userId);
     }
 }

@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.db;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -13,11 +12,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpaa;
+import ru.yandex.practicum.filmorate.model.SimpleEntity;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.LikeStorage;
 
 @Slf4j
 @Repository
@@ -25,19 +21,11 @@ public class FilmDbStorage implements FilmStorage {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private GenreStorage genreStorage;
-
-    @Autowired
-    private LikeStorage likeStorage;
-
     public Optional<Film> create(final Film film) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
                 .usingGeneratedKeyColumns("id");
         int id = simpleJdbcInsert.executeAndReturnKey(filmToMap(film)).intValue();
-        film.setId(id);
-        saveGenres(film);
 
         return findById(id);
     }
@@ -54,7 +42,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getMpa().getId(),
                 id);
-        saveGenres(film);
 
         return findById(id);
     }
@@ -83,11 +70,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "SELECT *, mpaa.name AS rating_name " +
                 "FROM films LEFT JOIN mpaa ON films.rating_id = mpaa.id";
 
-        return jdbcTemplate.query(sql, this::rowToFilm)
-                           .stream()
-//                           .peek(this::loadGenres)
-//                           .peek(this::loadLikes)
-                           .collect(Collectors.toList());
+        return new ArrayList<>(jdbcTemplate.query(sql, this::rowToFilm));
     }
 
     public List<Film> getTop(final int count) {
@@ -100,7 +83,6 @@ public class FilmDbStorage implements FilmStorage {
 
         return jdbcTemplate.query(sql, this::rowToFilm, count)
                            .stream()
-                           .peek(this::loadGenres)
                            .peek(this::loadLikes)
                            .collect(Collectors.toList());
     }
@@ -122,37 +104,14 @@ public class FilmDbStorage implements FilmStorage {
                    .description(resultSet.getString("description"))
                    .releaseDate(resultSet.getDate("release_date").toLocalDate())
                    .duration(resultSet.getInt("duration"))
-                   .mpa(new Mpaa(resultSet.getInt("rating_id"),
-                                resultSet.getString("rating_name")))
+                   .mpa(new SimpleEntity(
+                           resultSet.getInt("rating_id"),
+                           resultSet.getString("rating_name")))
                    .build();
-    }
-
-    private void loadGenres(final Film film) {
-        film.setGenres(new HashSet<>(genreStorage.findByFilm(film.getId())));
     }
 
     private void loadLikes(final Film film) {
         String sql = "SELECT user_id FROM likes WHERE film_id = ?";
         film.setLikes(new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, film.getId())));
-    }
-
-    private void saveGenres(final Film film) {
-        String sql = "DELETE FROM film_genres WHERE film_id = ?";
-        jdbcTemplate.update(sql, film.getId());
-
-        if (film.getGenres() == null) {
-            return;
-        }
-
-        film.getGenres().forEach((genre)->this.saveGenre(film, genre));
-    }
-
-    private void saveGenre(final Film film, final Genre genre) {
-        String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
-        try {
-            jdbcTemplate.update(sql, film.getId(), genre.getId());
-        } catch (DataAccessException e) {
-            log.debug("updateGenresOfFilm: " + e.getMessage());
-        }
     }
 }

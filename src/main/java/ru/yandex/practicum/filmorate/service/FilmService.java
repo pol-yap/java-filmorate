@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SimpleEntity;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class FilmService {
@@ -25,6 +28,9 @@ public class FilmService {
     @Autowired
     private LikeService likeService;
 
+    @Autowired
+    private FilmGenreService filmGenreService;
+
     public Film create(Film film) {
         if (! film.isReleaseDateCorrect()) {
             throw new BadRequestException(String.format(
@@ -32,19 +38,26 @@ public class FilmService {
                     film.getReleaseDate()));
         }
 
+        Optional<Set<SimpleEntity>> optionalGenres = Optional.ofNullable(film.getGenres()) ;
+
         Film createdFilm =  storage.create(film)
                                    .orElseThrow(()->new BadRequestException("Не удалось создать новый фильм"));
-        enrichByLinkedData(createdFilm);
+        optionalGenres.ifPresent(genres -> filmGenreService.updateFilmGenres(createdFilm.getId(), genres));
+        enrichByLikesAndGenres(createdFilm);
 
         return createdFilm;
     }
 
     public Film update(Film film) {
-        throwExceptionIfNoSuchId(film.getId());
+        int id = film.getId();
+        throwExceptionIfNoSuchId(id);
+
+        Optional<Set<SimpleEntity>> optionalGenres = Optional.ofNullable(film.getGenres());
 
         Film updatedFilm =  storage.update(film)
                                    .orElseThrow(()->new BadRequestException("Не удалось обновить данные о фильме"));
-        enrichByLinkedData(updatedFilm);
+        optionalGenres.ifPresent(genres -> filmGenreService.updateFilmGenres(id, genres));
+        enrichByLikesAndGenres(updatedFilm);
 
         return updatedFilm;
     }
@@ -62,7 +75,7 @@ public class FilmService {
 
         Film film = storage.findById(id)
                            .orElseThrow(()->new NotFoundException(id, "фильм"));
-        enrichByLinkedData(film);
+        enrichByLikesAndGenres(film);
 
         return film;
     }
@@ -89,8 +102,8 @@ public class FilmService {
         }
     }
 
-    private void enrichByLinkedData(Film film) {
-        film.setGenres(genreService.findByFilm(film.getId()));
+    private void enrichByLikesAndGenres(Film film) {
+        film.setGenres(filmGenreService.findByFilm(film.getId()));
         film.setLikes(likeService.findByFilm(film.getId()));
     }
 }

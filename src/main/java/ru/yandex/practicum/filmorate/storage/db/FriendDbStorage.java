@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
 
-import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -22,11 +21,7 @@ public class FriendDbStorage extends IntegerLinkDbStorage implements FriendStora
         super.removeLink(friendingId, friendedId);
     }
 
-    public Set<Integer> getFriends(int userId) {
-        return super.getLinked(userId);
-    }
-
-    public Map<Integer, Integer> findAll() {
-        return super.getAll();
+    public Set<Integer> getFriendIds(int userId) {
+        return super.findLinked(userId);
     }
 }

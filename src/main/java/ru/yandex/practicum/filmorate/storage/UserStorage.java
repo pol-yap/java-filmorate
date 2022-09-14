@@ -12,9 +12,6 @@ public interface UserStorage {
     void delete(final int id);
     boolean isContainsId(final int id);
     List<User> findAll();
-//    void addFriend(final int userId, final int friendId);
-//    void removeFriend(final int userId, final int friendId);
-    //List<Integer> getFriendsId(final int id);
     List<User> getFriends(final int id);
     List<User> getCommonFriends(final int id, final int otherId);
 }

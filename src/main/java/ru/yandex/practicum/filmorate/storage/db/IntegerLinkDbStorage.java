@@ -36,7 +36,14 @@ public abstract class IntegerLinkDbStorage {
         jdbcTemplate.update(sql, linking, linked);
     }
 
-    public Set<Integer> getLinking(final int linked) {
+    public void removeAllByLinking(final int linking) {
+        String sql = String.format("DELETE FROM %s WHERE %s = ?",
+                tableName,
+                linkingFieldName);
+        jdbcTemplate.update(sql, linking);
+    }
+
+    public Set<Integer> findLinking(final int linked) {
         String sql = String.format("SELECT %2$s FROM %1$s WHERE %3$s = ?",
                 tableName,
                 linkingFieldName,
@@ -45,7 +52,7 @@ public abstract class IntegerLinkDbStorage {
         return new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, linked));
     }
 
-    public Set<Integer> getLinked(final int linking) {
+    public Set<Integer> findLinked(final int linking) {
         String sql = String.format("SELECT %3$s FROM %1$s WHERE %2$s = ?",
                 tableName,
                 linkingFieldName,
@@ -54,7 +61,7 @@ public abstract class IntegerLinkDbStorage {
         return new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, linking));
     }
 
-    public Map<Integer, Integer> getAll() {
+    public Map<Integer, Integer> findAll() {
         String sql = String.format("SELECT * FROM %s", tableName);
 
         Map<Integer, Integer> result = new HashMap<>();
@@ -66,6 +73,4 @@ public abstract class IntegerLinkDbStorage {
     protected IntegerLink rowToIntegerLink(final ResultSet resultSet, final int rowNum) throws SQLException {
         return new IntegerLink(resultSet.getInt(linkingFieldName), resultSet.getInt(linkedFieldName));
     }
-
-
 }

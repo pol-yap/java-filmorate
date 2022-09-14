@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -32,9 +33,9 @@ public class Film {
     private int duration;
 
     @NotNull
-    private Mpaa mpa;
+    private SimpleEntity mpa;
 
-    private Set<Genre> genres;
+    private Set<SimpleEntity> genres;
 
     public boolean isReleaseDateCorrect() {
         return ! releaseDate.isBefore(CINEMA_BIRTHDAY);

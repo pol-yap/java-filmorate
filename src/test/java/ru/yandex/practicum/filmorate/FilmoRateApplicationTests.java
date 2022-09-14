@@ -3,34 +3,47 @@ package ru.yandex.practicum.filmorate;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpaa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.MpaaStorage;
+import ru.yandex.practicum.filmorate.storage.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.SimpleStorage;
 import ru.yandex.practicum.filmorate.storage.db.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+//@RequiredArgsConstructor(onConstructor_ = @Autowired)
 
 class FilmoRateApplicationTests {
-    private final UserDbStorage userStorage;
-    private final FilmDbStorage filmStorage;
-    private final GenreStorage genreStorage;
-    private final MpaaStorage mpaaStorage;
-    private final FriendStorage friendStorage;
+    @Autowired
+    private UserDbStorage userStorage;
+
+    @Autowired
+    private FilmDbStorage filmStorage;
+
+    @Autowired
+    @Qualifier("genreDbStorage")
+    private SimpleStorage genreStorage;
+
+    @Autowired
+    @Qualifier("mpaaDbStorage")
+    private SimpleStorage mpaaStorage;
+
+    @Autowired
+    private FriendStorage friendStorage;
+
+    @Autowired
+    private LikeStorage likeStorage;
 
     @Test
     public void testCreateUser() {
@@ -74,20 +87,20 @@ class FilmoRateApplicationTests {
 
     }
 
-//    @Test
-//    public void testFriends() {
-//        userStorage.addFriend(1,2);
-//
-//        List<User> friends1 = userStorage.getFriends(1);
-//        assertThat(friends1).hasSize(1);
-//
-//        List<User> friends2 = userStorage.getFriends(2);
-//        assertThat(friends2).hasSize(0);
-//
-//        userStorage.removeFriend(1,2);
-//        friends1 = userStorage.getFriends(1);
-//        assertThat(friends1).hasSize(0);
-//    }
+    @Test
+    public void testFriends() {
+        friendStorage.addFriend(1,2);
+
+        Set<Integer> friends1 = friendStorage.getFriendIds(1);
+        assertThat(friends1).hasSize(1);
+
+        Set<Integer> friends2 = friendStorage.getFriendIds(2);
+        assertThat(friends2).hasSize(0);
+
+        friendStorage.removeFriend(1,2);
+        friends1 = friendStorage.getFriendIds(1);
+        assertThat(friends1).hasSize(0);
+    }
 
     @Test
     public void testFindAllUsers() {
@@ -103,7 +116,7 @@ class FilmoRateApplicationTests {
                                                         .description("mail@server.io")
                                                         .duration(130)
                                                         .releaseDate(LocalDate.of(1993, 1, 1))
-                                                        .mpa(new Mpaa(1, ""))
+                                                        .mpa(new SimpleEntity(1, ""))
                                                         .build());
 
         assertThat(newEntity).isPresent()
@@ -153,33 +166,35 @@ class FilmoRateApplicationTests {
         assertThat(entities).hasSize(2);
     }
 
-//    @Test
-//    public void testLikes() {
-//        filmStorage.addLike(1,1);
-//
-//        Optional<Film> optionalEntity = filmStorage.findById(1);
-//        assertThat(optionalEntity).isPresent();
-//        Film storedEntity = optionalEntity.get();
-//        assertThat(storedEntity.getLikes()).hasSize(1);
-//
-//        filmStorage.removeLike(1,1);
-//        optionalEntity = filmStorage.findById(1);
-//        assertThat(optionalEntity).isPresent();
-//        storedEntity = optionalEntity.get();
-//        assertThat(storedEntity.getLikes()).hasSize(0);
-//    }
+    @Test
+    public void testLikes() {
+        likeStorage.addLike(1,1);
 
-//    @Test
-//    public void testGetTop() {
-//        filmStorage.addLike(2,1);
-//        List<Film> top = filmStorage.getTop(1);
-//        assertThat(top).hasSize(1);
-//        assertThat(top.get(0).getId()).isEqualTo(2);
-//    }
+        Optional<Film> optionalEntity = filmStorage.findById(1);
+        assertThat(optionalEntity).isPresent();
+        Film storedEntity = optionalEntity.get();
+        storedEntity.setLikes(likeStorage.findByFilm(storedEntity.getId()));
+        assertThat(storedEntity.getLikes()).hasSize(1);
+
+        likeStorage.removeLike(1,1);
+        optionalEntity = filmStorage.findById(1);
+        assertThat(optionalEntity).isPresent();
+        storedEntity = optionalEntity.get();
+        storedEntity.setLikes(likeStorage.findByFilm(storedEntity.getId()));
+        assertThat(storedEntity.getLikes()).hasSize(0);
+    }
+
+    @Test
+    public void testGetTop() {
+        likeStorage.addLike(2,1);
+        List<Film> top = filmStorage.getTop(1);
+        assertThat(top).hasSize(1);
+        assertThat(top.get(0).getId()).isEqualTo(2);
+    }
 
     @Test
     public void testCreateGenre() {
-        Optional<Genre> newEntity = genreStorage.create(new Genre(0, "новый жанр"));
+        Optional<SimpleEntity> newEntity = genreStorage.create(new SimpleEntity(0, "новый жанр"));
 
         assertThat(newEntity).isPresent()
                              .hasValueSatisfying((entity) -> {
@@ -190,7 +205,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testFindGenreById() {
-        Optional<Genre> optionalEntity = genreStorage.findById(1);
+        Optional<SimpleEntity> optionalEntity = genreStorage.findById(1);
 
         assertThat(optionalEntity).isPresent()
                                   .hasValueSatisfying((entity) -> {
@@ -200,13 +215,13 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testUpdateGenre() {
-        Optional<Genre> optionalEntity = genreStorage.findById(1);
+        Optional<SimpleEntity> optionalEntity = genreStorage.findById(1);
         assertThat(optionalEntity).isPresent();
 
-        Genre storedEntity = optionalEntity.get();
+        SimpleEntity storedEntity = optionalEntity.get();
         storedEntity.setName("теперь такой жанр");
 
-        Optional<Genre> updatedEntity = genreStorage.update(storedEntity);
+        Optional<SimpleEntity> updatedEntity = genreStorage.update(storedEntity);
         assertThat(updatedEntity).isPresent()
                                  .hasValueSatisfying((entity) -> {
                                      assertThat(entity).hasFieldOrPropertyWithValue("name", "теперь такой жанр");
@@ -216,14 +231,14 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testFindAllGenres() {
-        List<Genre> entities = genreStorage.findAll();
+        List<SimpleEntity> entities = genreStorage.findAll();
 
         assertThat(entities).hasSize(7);
     }
 
     @Test
     public void testCreateMPA() {
-        Optional<Mpaa> newEntity = mpaaStorage.create(new Mpaa(0, "EX"));
+        Optional<SimpleEntity> newEntity = mpaaStorage.create(new SimpleEntity(0, "EX"));
 
         assertThat(newEntity).isPresent()
                              .hasValueSatisfying((entity) -> {
@@ -234,7 +249,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testFindMPAById() {
-        Optional<Mpaa> optionalEntity = mpaaStorage.findById(1);
+        Optional<SimpleEntity> optionalEntity = mpaaStorage.findById(1);
 
         assertThat(optionalEntity).isPresent()
                                   .hasValueSatisfying((entity) -> {
@@ -244,13 +259,13 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testUpdateMPA() {
-        Optional<Mpaa> optionalEntity = mpaaStorage.findById(1);
+        Optional<SimpleEntity> optionalEntity = mpaaStorage.findById(1);
         assertThat(optionalEntity).isPresent();
 
-        Mpaa storedEntity = optionalEntity.get();
+        SimpleEntity storedEntity = optionalEntity.get();
         storedEntity.setName("XXX");
 
-        Optional<Mpaa> updatedEntity = mpaaStorage.update(storedEntity);
+        Optional<SimpleEntity> updatedEntity = mpaaStorage.update(storedEntity);
         assertThat(updatedEntity).isPresent()
                                  .hasValueSatisfying((entity) -> {
                                      assertThat(entity).hasFieldOrPropertyWithValue("name", "XXX");
@@ -260,7 +275,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testFindAllMPA() {
-        List<Mpaa> entities = mpaaStorage.findAll();
+        List<SimpleEntity> entities = mpaaStorage.findAll();
 
         assertThat(entities).hasSize(5);
     }

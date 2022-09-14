@@ -1,44 +1,47 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.model.SimpleEntity;
+import ru.yandex.practicum.filmorate.storage.SimpleStorage;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class GenreService {
     @Autowired
-    private GenreStorage storage;
+    @Qualifier("genreDbStorage")
+    private SimpleStorage storage;
 
-    public Genre create(Genre genre) {
+    public SimpleEntity create(SimpleEntity genre) {
         return storage.create(genre)
                       .orElseThrow(()->new BadRequestException("Не удалось создать новый жанр"));
     }
 
-    public Genre update(Genre genre) {
+    public SimpleEntity update(SimpleEntity genre) {
         throwExceptionIfNoSuchId(genre.getId());
         return storage.update(genre)
                       .orElseThrow(()->new BadRequestException("Не удалось обновить жанр"));
     }
 
-    public Genre findById(int id) {
+    public SimpleEntity findById(int id) {
         throwExceptionIfNoSuchId(id);
         return storage.findById(id)
                       .orElseThrow(()->new NotFoundException(id, "жанр"));
     }
 
-    public Set<Genre> findByFilm(final int filmId) {
-        return storage.findByFilm(filmId);
+    public List<SimpleEntity> findAll() {
+        return storage.findAll()
+                      .stream()
+                      .sorted(Comparator.comparingInt(SimpleEntity::getId))
+                      .collect(Collectors.toList());
     }
 
-    public List<Genre> findAll() {
-        return storage.findAll();
-    }
 
     protected void throwExceptionIfNoSuchId(int id) {
         if (! storage.isContainsId(id)) {

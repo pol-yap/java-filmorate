@@ -22,6 +22,6 @@ public class LikeDbStorage extends IntegerLinkDbStorage implements LikeStorage {
     }
 
     public Set<Integer> findByFilm(int filmId) {
-        return super.getLinked(filmId);
+        return super.findLinked(filmId);
     }
 }

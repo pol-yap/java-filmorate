@@ -18,9 +18,6 @@ public class UserDbStorage implements UserStorage {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private FriendDbStorage friendStorage;
-
     public Optional<User> create(final User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
@@ -102,11 +99,4 @@ public class UserDbStorage implements UserStorage {
                    .birthday(resultSet.getDate("birthday").toLocalDate())
                    .build();
     }
-
-//    private void loadFriendsId(final User user, Map<Integer, Integer> friends) {
-//        friends.keySet()
-//               .stream()
-//               .filter(key -> key == user.getId())
-//               .forEach(key -> user.getFriendsId().add(friends.get(key)));
-//    }
 }
