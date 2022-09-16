@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,14 +15,19 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
-@RequiredArgsConstructor
-public abstract class SimpleDbStorage implements SimpleStorage {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
+//@RequiredArgsConstructor
+public abstract class SimpleDbStorage<T extends SimpleEntity> implements SimpleStorage<T> {
+    private final JdbcTemplate jdbcTemplate;
     private final String tableName;
 
-    public Optional<SimpleEntity> create(final SimpleEntity entity) {
+    @Autowired
+    public SimpleDbStorage(JdbcTemplate jdbcTemplate, String tableName) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.tableName = tableName;
+
+    }
+
+    public Optional<T> create(final T entity) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName(tableName)
                 .usingGeneratedKeyColumns("id");
@@ -32,7 +36,7 @@ public abstract class SimpleDbStorage implements SimpleStorage {
         return findById(id);
     }
 
-    public Optional<SimpleEntity> update(final SimpleEntity entity) {
+    public Optional<T> update(final T entity) {
         String sql = String.format("UPDATE %s SET name = ? WHERE id = ?", tableName);
         jdbcTemplate.update(sql, entity.getName(), entity.getId());
 
@@ -44,7 +48,7 @@ public abstract class SimpleDbStorage implements SimpleStorage {
         jdbcTemplate.update(sql, id);
     }
 
-    public Optional<SimpleEntity> findById(final int id) {
+    public Optional<T> findById(final int id) {
         String sql = String.format("SELECT * FROM %s WHERE id = ?", tableName);
         return jdbcTemplate.query(sql, this::rowToEntity, id).stream().findFirst();
     }
@@ -56,7 +60,7 @@ public abstract class SimpleDbStorage implements SimpleStorage {
         return found == 1;
     }
 
-    public List<SimpleEntity> findAll() {
+    public List<T> findAll() {
         String sql = String.format("SELECT * FROM %s", tableName);
 
         return new ArrayList<>(jdbcTemplate.query(sql, this::rowToEntity));
@@ -66,10 +70,5 @@ public abstract class SimpleDbStorage implements SimpleStorage {
         return Map.of("name", entity.getName());
     }
 
-    private SimpleEntity rowToEntity(final ResultSet resultSet, final int rowNum) throws SQLException {
-        return new SimpleEntity(
-                resultSet.getInt("id"),
-                resultSet.getString("name")
-        );
-    }
+    abstract T rowToEntity(final ResultSet resultSet, final int rowNum) throws SQLException;
 }

@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.SimpleEntity;
-import ru.yandex.practicum.filmorate.storage.SimpleStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.Comparator;
 import java.util.List;
@@ -15,27 +15,27 @@ import java.util.stream.Collectors;
 @Service
 public class GenreService {
     @Autowired
-    @Qualifier("genreDbStorage")
-    private SimpleStorage storage;
+    //@Qualifier("genreDbStorage")
+    private GenreStorage storage;
 
-    public SimpleEntity create(SimpleEntity genre) {
+    public Genre create(Genre genre) {
         return storage.create(genre)
                       .orElseThrow(()->new BadRequestException("Не удалось создать новый жанр"));
     }
 
-    public SimpleEntity update(SimpleEntity genre) {
+    public Genre update(Genre genre) {
         throwExceptionIfNoSuchId(genre.getId());
         return storage.update(genre)
                       .orElseThrow(()->new BadRequestException("Не удалось обновить жанр"));
     }
 
-    public SimpleEntity findById(int id) {
+    public Genre findById(int id) {
         throwExceptionIfNoSuchId(id);
         return storage.findById(id)
                       .orElseThrow(()->new NotFoundException(id, "жанр"));
     }
 
-    public List<SimpleEntity> findAll() {
+    public List<Genre> findAll() {
         return storage.findAll()
                       .stream()
                       .sorted(Comparator.comparingInt(SimpleEntity::getId))

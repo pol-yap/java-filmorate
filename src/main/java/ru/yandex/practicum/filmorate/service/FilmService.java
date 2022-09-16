@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.SimpleEntity;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class FilmService {
                     film.getReleaseDate()));
         }
 
-        Optional<Set<SimpleEntity>> optionalGenres = Optional.ofNullable(film.getGenres()) ;
+        Optional<Set<Genre>> optionalGenres = Optional.ofNullable(film.getGenres()) ;
 
         Film createdFilm =  storage.create(film)
                                    .orElseThrow(()->new BadRequestException("Не удалось создать новый фильм"));
@@ -52,7 +52,7 @@ public class FilmService {
         int id = film.getId();
         throwExceptionIfNoSuchId(id);
 
-        Optional<Set<SimpleEntity>> optionalGenres = Optional.ofNullable(film.getGenres());
+        Optional<Set<Genre>> optionalGenres = Optional.ofNullable(film.getGenres());
 
         Film updatedFilm =  storage.update(film)
                                    .orElseThrow(()->new BadRequestException("Не удалось обновить данные о фильме"));

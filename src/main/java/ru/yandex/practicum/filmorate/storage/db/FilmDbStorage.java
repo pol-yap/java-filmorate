@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpaa;
 import ru.yandex.practicum.filmorate.model.SimpleEntity;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -104,7 +105,7 @@ public class FilmDbStorage implements FilmStorage {
                    .description(resultSet.getString("description"))
                    .releaseDate(resultSet.getDate("release_date").toLocalDate())
                    .duration(resultSet.getInt("duration"))
-                   .mpa(new SimpleEntity(
+                   .mpa(new Mpaa(
                            resultSet.getInt("rating_id"),
                            resultSet.getString("rating_name")))
                    .build();

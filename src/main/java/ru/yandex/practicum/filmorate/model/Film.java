@@ -33,9 +33,9 @@ public class Film {
     private int duration;
 
     @NotNull
-    private SimpleEntity mpa;
+    private Mpaa mpa;
 
-    private Set<SimpleEntity> genres;
+    private Set<Genre> genres;
 
     public boolean isReleaseDateCorrect() {
         return ! releaseDate.isBefore(CINEMA_BIRTHDAY);

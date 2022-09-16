@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.db;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.SimpleEntity;
 import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
 
@@ -16,14 +17,14 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public Set<SimpleEntity> findByFilm(int filmId) {
+    public Set<Genre> findByFilm(int filmId) {
         String sql = "SELECT * FROM genres " +
                 "JOIN film_genres fg ON genres.id = fg.genre_id WHERE fg.film_id = ? ORDER BY id";
 
         return new HashSet<>(jdbcTemplate.query(sql, this::rowToEntity, filmId));
     }
 
-    public void updateFilmGenres(int filmId, Set<SimpleEntity> genres) {
+    public void updateFilmGenres(int filmId, Set<Genre> genres) {
         String deleteSql = "DELETE FROM film_genres WHERE film_id = ?";
         jdbcTemplate.update(deleteSql, filmId);
 
@@ -33,8 +34,8 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
         genres.forEach(genre -> jdbcTemplate.update(insertSql, filmId, genre.getId()));
     }
 
-    private SimpleEntity rowToEntity(final ResultSet resultSet, final int rowNum) throws SQLException {
-        return new SimpleEntity(
+    private Genre rowToEntity(final ResultSet resultSet, final int rowNum) throws SQLException {
+        return new Genre(
                 resultSet.getInt("id"),
                 resultSet.getString("name")
         );
