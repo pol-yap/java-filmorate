@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
@@ -13,10 +14,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GenreService {
-    @Autowired
-    //@Qualifier("genreDbStorage")
-    private GenreStorage storage;
+    private final GenreStorage storage;
 
     public Genre create(Genre genre) {
         return storage.create(genre)

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.SimpleEntity;
 import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
 
 import java.sql.ResultSet;
@@ -14,8 +13,12 @@ import java.util.Set;
 
 @Repository
 public class FilmGenreDbStorage implements FilmGenreStorage {
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public FilmGenreDbStorage(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     public Set<Genre> findByFilm(int filmId) {
         String sql = "SELECT * FROM genres " +

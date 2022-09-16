@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -15,21 +16,25 @@ import java.util.Set;
 
 @Service
 public class FilmService {
-    @Autowired
-    @Qualifier("filmDbStorage")
-    private FilmStorage storage;
+    private final FilmStorage storage;
+    private final UserService userService;
+    private final GenreService genreService;
+    private final LikeService likeService;
+    private final FilmGenreService filmGenreService;
 
     @Autowired
-    private UserService userService;
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage storage,
+                       UserService userService,
+                       GenreService genreService,
+                       LikeService likeService,
+                       FilmGenreService filmGenreService) {
 
-    @Autowired
-    private GenreService genreService;
-
-    @Autowired
-    private LikeService likeService;
-
-    @Autowired
-    private FilmGenreService filmGenreService;
+        this.storage = storage;
+        this.userService = userService;
+        this.genreService = genreService;
+        this.likeService = likeService;
+        this.filmGenreService = filmGenreService;
+    }
 
     public Film create(Film film) {
         if (! film.isReleaseDateCorrect()) {

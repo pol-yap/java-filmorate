@@ -12,12 +12,15 @@ import java.util.List;
 
 @Service
 public class UserService {
-    @Autowired
-    @Qualifier("userDbStorage")
-    private UserStorage storage;
+    private final UserStorage storage;
+    private final FriendService friendService;
 
     @Autowired
-    private FriendService friendService;
+    public UserService(@Qualifier("userDbStorage") UserStorage storage,
+                       FriendService friendService) {
+        this.storage = storage;
+        this.friendService = friendService;
+    }
 
     public User create(User user) {
         fixName(user);

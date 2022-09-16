@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.SimpleEntity;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.GenreService;
 
 import java.util.List;
@@ -11,8 +12,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/genres")
 public class GenreController {
+    private final GenreService service;
+
     @Autowired
-    private GenreService service;
+    public GenreController(GenreService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<Genre> findAll() {

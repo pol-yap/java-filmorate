@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,17 +16,10 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
-//@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public abstract class SimpleDbStorage<T extends SimpleEntity> implements SimpleStorage<T> {
     private final JdbcTemplate jdbcTemplate;
     private final String tableName;
-
-    @Autowired
-    public SimpleDbStorage(JdbcTemplate jdbcTemplate, String tableName) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.tableName = tableName;
-
-    }
 
     public Optional<T> create(final T entity) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)

@@ -11,10 +11,9 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public abstract class IntegerLinkDbStorage {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     private final String tableName;
     private final String linkingFieldName;

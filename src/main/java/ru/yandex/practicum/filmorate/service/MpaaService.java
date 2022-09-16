@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
@@ -10,10 +11,9 @@ import ru.yandex.practicum.filmorate.storage.MpaaStorage;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class MpaaService {
-    @Autowired
-    //@Qualifier("mpaaDbStorage")
-    private MpaaStorage storage;
+    private final MpaaStorage storage;
 
     public Mpaa create(Mpaa mpa) {
         return storage.create(mpa)
