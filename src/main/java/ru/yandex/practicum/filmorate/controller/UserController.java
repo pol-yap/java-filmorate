@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int userId) {
         service.delete(userId);
     }
@@ -51,6 +51,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeFriend(@PathVariable int userId, @PathVariable int friendId) {
         service.removeFriend(userId, friendId);
     }

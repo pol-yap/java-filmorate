@@ -41,7 +41,7 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}")
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int filmId) {
         service.delete(filmId);
     }
@@ -57,6 +57,7 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeLike(@PathVariable int filmId, @PathVariable int userId) {
         service.removeLike(filmId, userId);
     }
