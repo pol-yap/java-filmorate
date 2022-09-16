@@ -1,12 +1,15 @@
 package ru.yandex.practicum.filmorate;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.MpaaStorage;
 import ru.yandex.practicum.filmorate.storage.db.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.MpaaDbStorage;
@@ -21,28 +24,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-//@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 
 class FilmoRateApplicationTests {
-    @Autowired
-    private UserDbStorage userStorage;
-
-    @Autowired
-    private FilmDbStorage filmStorage;
-
-    @Autowired
-    //@Qualifier("genreDbStorage")
-    private GenreDbStorage genreStorage;
-
-    @Autowired
-    //@Qualifier("mpaaDbStorage")
-    private MpaaDbStorage mpaaStorage;
-
-    @Autowired
-    private FriendStorage friendStorage;
-
-    @Autowired
-    private LikeStorage likeStorage;
+    private final UserDbStorage userStorage;
+    private final FilmDbStorage filmStorage;
+    private final GenreStorage genreStorage;
+    private final MpaaStorage mpaaStorage;
+    private final FriendStorage friendStorage;
+    private final LikeStorage likeStorage;
 
     @Test
     public void testCreateUser() {
