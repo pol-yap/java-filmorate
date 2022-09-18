@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -8,9 +7,11 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,22 +19,19 @@ import java.util.Set;
 public class FilmService {
     private final FilmStorage storage;
     private final UserService userService;
-    private final GenreService genreService;
+    private final FilmGenreStorage filmGenreStorage;
     private final LikeService likeService;
-    private final FilmGenreService filmGenreService;
 
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage storage,
                        UserService userService,
-                       GenreService genreService,
-                       LikeService likeService,
-                       FilmGenreService filmGenreService) {
+                       FilmGenreStorage filmGenreStorage,
+                       LikeService likeService) {
 
         this.storage = storage;
         this.userService = userService;
-        this.genreService = genreService;
+        this.filmGenreStorage = filmGenreStorage;
         this.likeService = likeService;
-        this.filmGenreService = filmGenreService;
     }
 
     public Film create(Film film) {
@@ -47,21 +45,20 @@ public class FilmService {
 
         Film createdFilm =  storage.create(film)
                                    .orElseThrow(()->new BadRequestException("Не удалось создать новый фильм"));
-        optionalGenres.ifPresent(genres -> filmGenreService.updateFilmGenres(createdFilm.getId(), genres));
+        optionalGenres.ifPresent(genres -> filmGenreStorage.updateFilmGenres(createdFilm, genres));
         enrichByLikesAndGenres(createdFilm);
 
         return createdFilm;
     }
 
     public Film update(Film film) {
-        int id = film.getId();
-        throwExceptionIfNoSuchId(id);
+        throwExceptionIfNoSuchId(film.getId());
 
         Optional<Set<Genre>> optionalGenres = Optional.ofNullable(film.getGenres());
 
         Film updatedFilm =  storage.update(film)
                                    .orElseThrow(()->new BadRequestException("Не удалось обновить данные о фильме"));
-        optionalGenres.ifPresent(genres -> filmGenreService.updateFilmGenres(id, genres));
+        optionalGenres.ifPresent(genres -> filmGenreStorage.updateFilmGenres(film, genres));
         enrichByLikesAndGenres(updatedFilm);
 
         return updatedFilm;
@@ -72,7 +69,9 @@ public class FilmService {
     }
 
     public List<Film> findAll() {
-        return storage.findAll();
+        List<Film> allFilms = storage.findAll();
+        enrichByLikesAndGenres(allFilms);
+        return allFilms;
     }
 
     public Film findById(int id) {
@@ -98,7 +97,9 @@ public class FilmService {
     }
 
     public List<Film> getTop(int count) {
-        return storage.getTop(count);
+        List<Film> top = storage.getTop(count);
+        enrichByLikesAndGenres(top);
+        return top;
     }
 
     private void throwExceptionIfNoSuchId(int id) {
@@ -108,7 +109,12 @@ public class FilmService {
     }
 
     private void enrichByLikesAndGenres(Film film) {
-        film.setGenres(filmGenreService.findByFilm(film.getId()));
+        film.setGenres(filmGenreStorage.findByFilm(film));
         film.setLikes(likeService.findByFilm(film.getId()));
+    }
+
+    private void enrichByLikesAndGenres(List<Film> films) {
+        Map<Integer, Set<Genre>> genreData = filmGenreStorage.findByFilms(films);
+        films.forEach(film -> film.setGenres(genreData.get(film.getId())));
     }
 }
