@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.LikeStorage;
 
 import java.util.List;
 import java.util.Map;
@@ -20,18 +21,18 @@ public class FilmService {
     private final FilmStorage storage;
     private final UserService userService;
     private final FilmGenreStorage filmGenreStorage;
-    private final LikeService likeService;
+    private final LikeStorage likeStorage;
 
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage storage,
                        UserService userService,
                        FilmGenreStorage filmGenreStorage,
-                       LikeService likeService) {
+                       LikeStorage likeStorage) {
 
         this.storage = storage;
         this.userService = userService;
         this.filmGenreStorage = filmGenreStorage;
-        this.likeService = likeService;
+        this.likeStorage = likeStorage;
     }
 
     public Film create(Film film) {
@@ -87,13 +88,13 @@ public class FilmService {
     public void addLike(int filmId, int userId) {
         throwExceptionIfNoSuchId(filmId);
         userService.throwExceptionIfNoSuchId(userId);
-        likeService.addLike(filmId, userId);
+        likeStorage.addLike(filmId, userId);
     }
 
     public void removeLike(int filmId, int userId) {
         throwExceptionIfNoSuchId(filmId);
         userService.throwExceptionIfNoSuchId(userId);
-        likeService.removeLike(filmId, userId);
+        likeStorage.removeLike(filmId, userId);
     }
 
     public List<Film> getTop(int count) {
@@ -110,7 +111,7 @@ public class FilmService {
 
     private void enrichByLikesAndGenres(Film film) {
         film.setGenres(filmGenreStorage.findByFilm(film));
-        film.setLikes(likeService.findByFilm(film.getId()));
+        film.setLikes(likeStorage.findByFilm(film.getId()));
     }
 
     private void enrichByLikesAndGenres(List<Film> films) {

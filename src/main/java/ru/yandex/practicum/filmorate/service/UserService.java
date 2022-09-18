@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
@@ -13,13 +14,13 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserStorage storage;
-    private final FriendService friendService;
+    private final FriendStorage friendStorage;
 
     @Autowired
     public UserService(@Qualifier("userDbStorage") UserStorage storage,
-                       FriendService friendService) {
+                       FriendStorage friendStorage) {
         this.storage = storage;
-        this.friendService = friendService;
+        this.friendStorage = friendStorage;
     }
 
     public User create(User user) {
@@ -44,7 +45,7 @@ public class UserService {
     public User findById(int id) {
         User user = storage.findById(id)
                            .orElseThrow(() -> new NotFoundException(id, "пользователь"));
-        user.setFriendsId(friendService.getFriendsId(user.getId()));
+        user.setFriendsId(friendStorage.getFriendIds(user.getId()));
 
         return user;
     }
@@ -56,13 +57,13 @@ public class UserService {
     public void addFriend(int userId, int friendId) {
         throwExceptionIfNoSuchId(userId);
         throwExceptionIfNoSuchId(friendId);
-        friendService.addFriend(userId, friendId);
+        friendStorage.addFriend(friendId, userId);
     }
 
     public void removeFriend(int userId, int friendId) {
         throwExceptionIfNoSuchId(userId);
         throwExceptionIfNoSuchId(friendId);
-        friendService.removeFriend(userId, friendId);
+        friendStorage.removeFriend(friendId, userId);
     }
 
     public List<User> getFriends(int id) {
