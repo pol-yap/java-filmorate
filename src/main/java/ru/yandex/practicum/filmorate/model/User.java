@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
@@ -12,16 +12,21 @@ import java.util.Set;
 
 
 @Data
-@AllArgsConstructor
+@Builder
 public class User {
 
     private int id;
-    private final Set<Integer> friendsId = new HashSet<>();
+
+    private Set<Integer> friendsId = new HashSet<>();
+
     @Email
     private String email;
+
     @Pattern(regexp = "^[^ ]+$", message = "не должно содержать пробелов")
     private String login;
+
     private String name;
+
     @Past
     private LocalDate birthday;
 }
