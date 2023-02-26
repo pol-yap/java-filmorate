@@ -1,9 +1,9 @@
 # Filmorate
-Сервис оценки и рекомендации фильмов
+Movie rating and recommendation service
 
 ## Requirements
-- Java Platform (JDK) 11
-- Apache Maven 4.x
+- JDK 11
+- Apache Maven
 
 
 ## Quick start
@@ -14,3 +14,4 @@ mvn package
 ```
 java -jar -Dfile.encoding=UTF-8 target/filmorate-0.1.1-SNAPSHOT.jar
 ```
+
