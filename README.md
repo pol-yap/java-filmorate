@@ -8,10 +8,8 @@ Movie rating and recommendation service
 
 ## Quick start
 In project directory
-```
-mvn package
-```
-```
-java -jar -Dfile.encoding=UTF-8 target/filmorate-0.1.1-SNAPSHOT.jar
-```
+
+```mvn package```
+
+```java -jar -Dfile.encoding=UTF-8 target/filmorate-0.1.1-SNAPSHOT.jar```
 
