@@ -8,6 +8,11 @@ People watch movies and post online information about the movies they have watch
 - Users can add other users as friends.
 - Then users can get movie recommendations based on their friends' ratings
 
+## Technology stack
+- Java
+- Spring Boot
+- JDBC
+
 ## Requirements
 - JDK 11
 - Apache Maven
