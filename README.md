@@ -1,7 +1,7 @@
 # Filmorate
 Сервис оценки и рекомендации фильмов
 
-##Requirements
+## Requirements
 - Java Platform (JDK) 11
 - Apache Maven 4.x
 
