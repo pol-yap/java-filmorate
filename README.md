@@ -1,7 +1,13 @@
 # Filmorate
 Сервис оценки и рекомендации фильмов
 
+##Requirements
+- Java Platform (JDK) 11
+- Apache Maven 4.x
+
+
 ## Quick start
+In project directory
 ```
 mvn package
 ```
