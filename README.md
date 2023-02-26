@@ -6,7 +6,7 @@ People watch movies and post online information about the movies they have watch
 
 ## Features
 - Users can add other users as friends.
-- Then Users can get movie recommendations based on their friends' ratings
+- Then users can get movie recommendations based on their friends' ratings
 
 ## Requirements
 - JDK 11
